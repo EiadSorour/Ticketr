@@ -60,7 +60,7 @@ export const getQueuePosition = query({
       });
   
       // Process queue to offer ticket to next person
-      // await processQueue(ctx, { eventId });
+      await ctx.runMutation(api.waitingList.processQueue, { eventId });
     },
   });
 
