@@ -8,6 +8,7 @@ import { ConvexError } from "convex/values";
 import Spinner from "./Spinner";
 import { WAITING_LIST_STATUS } from "@/convex/constants";
 import { Clock, OctagonXIcon } from "lucide-react";
+import { Input } from "./ui/input";
 
 export default function JoinQueue({
     eventId,
@@ -93,13 +94,74 @@ export default function JoinQueue({
                 </p>
               </div>
             ) : (
-              <button
-                onClick={handleJoinQueue}
-                disabled={isPastEvent || isEventOwner}
-                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                Buy Ticket
-              </button>
+              <div>
+                
+                {/* ////////////////////////////////////////////// */}
+                <div className="grid grid-cols-1 gap-4 p-3 rounded-2xl border-2 border-gray-200">
+                  <div className="grid grid-cols-3 gap-6">
+                      <div className="">
+                          <Input type="number" min="0" defaultValue="1" onKeyDown={(e) => e.preventDefault()}/>
+                      </div>
+
+                      <div className="flex items-center text-gray-600 mb-1">
+                          <span className="text-sm font-medium">Silver Tickets</span>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-2 ml-4">
+                          <span
+                          className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
+                          >
+                          £{event.price.toFixed(2)}
+                          </span>
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-6">
+                      <div className="">
+                          <Input type="number" min="0" defaultValue="0" onKeyDown={(e) => e.preventDefault()}/>
+                      </div>
+
+                      <div className="flex items-center text-gray-600 mb-1">
+                          <span className="text-sm font-medium">Gold Tickets</span>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-2 ml-4">
+                          <span
+                          className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
+                          >
+                          £{event.price.toFixed(2)}
+                          </span>
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-6">
+                      <div className="">
+                          <Input type="number" min="0" defaultValue="0" onKeyDown={(e) => e.preventDefault()}/>
+                      </div>
+
+                      <div className="flex items-center text-gray-600 mb-1">
+                          <span className="text-sm font-medium">Platinum Tickets</span>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-2 ml-4">
+                          <span
+                          className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
+                          >
+                          £{event.price.toFixed(2)}
+                          </span>
+                      </div>
+                  </div>
+                </div>
+                {/* ////////////////////////////////////////////// */}
+
+                <button
+                  onClick={handleJoinQueue}
+                  disabled={isPastEvent || isEventOwner}
+                  className="mt-4 w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  Buy Ticket
+                </button>
+              </div>
             )}
           </>
         )}
