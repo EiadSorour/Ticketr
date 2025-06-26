@@ -119,13 +119,16 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
 
           {/* Right Column - QR Code */}
           <div className="flex flex-col items-center justify-center border-l border-gray-200 pl-6">
+            <p className="mb-2 text-sm text-gray-500 break-all text-center max-w-[200px] md:max-w-full font-medium">
+              Your QR code
+            </p>
             <div
               className={`bg-gray-100 p-4 rounded-lg ${ticket.event.is_cancelled ? "opacity-50" : ""}`}
             >
               <QRCode value={ticket._id} className="w-32 h-32" />
             </div>
             <p className="mt-2 text-sm text-gray-500 break-all text-center max-w-[200px] md:max-w-full">
-              Ticket ID: {ticket._id}
+              Thank you for your purchase 💙
             </p>
           </div>
         </div>
