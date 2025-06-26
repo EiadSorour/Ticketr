@@ -33,7 +33,7 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
       {/* Event Header with Image */}
       <div className="relative">
         {imageUrl && (
-          <div className="relative w-full aspect-[21/9] ">
+          <div className="relative w-full aspect-[21/11] ">
             <Image
               src={imageUrl}
               alt={ticket.event.name}

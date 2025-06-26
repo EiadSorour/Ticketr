@@ -150,7 +150,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
         >
           {/* Event Image */}
           {imageUrl && (
-            <div className="relative w-full h-48">
+            <div className="relative w-full h-80">
               <Image
                 src={imageUrl}
                 alt={event.name}
