@@ -24,6 +24,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useStorageUrl } from "@/lib/utils";
+import { Checkbox } from "./ui/checkbox";
 
 const formSchema = z.object({
   name: z.string().min(1, "Event name is required"),
@@ -35,8 +36,12 @@ const formSchema = z.object({
       new Date(new Date().setHours(0, 0, 0, 0)),
       "Event date must be in the future"
     ),
-  price: z.number().min(0, "Price must be 0 or greater"),
-  totalTickets: z.number().min(1, "Must have at least 1 ticket"),
+  silver_price: z.number().min(0, "Price must be 0 or greater"),
+  gold_price: z.number().min(0, "Price must be 0 or greater"),
+  platinum_price: z.number().min(0, "Price must be 0 or greater"),
+  totalSilverTickets: z.number().min(1, "Must have at least 1 ticket"),
+  totalGoldTickets: z.number().min(1, "Must have at least 1 ticket"),
+  totalPlatinumTickets: z.number().min(1, "Must have at least 1 ticket"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -74,6 +79,8 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
   const deleteImage = useMutation(api.storage.deleteImage);
 
   const [removedCurrentImage, setRemovedCurrentImage] = useState(false);
+  const [goldChecked, setGoldChecked] = useState(false);
+  const [platinumChecked, setPlatinumChecked] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -82,86 +89,23 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
       description: initialData?.description ?? "",
       location: initialData?.location ?? "",
       eventDate: initialData ? new Date(initialData.eventDate) : new Date(),
-      price: initialData?.price ?? 0,
-      totalTickets: initialData?.totalTickets ?? 1,
+      silver_price: initialData?.price ?? 0,
+      gold_price: initialData?.price ?? 0,
+      platinum_price: initialData?.price ?? 0,
+      totalSilverTickets: initialData?.totalTickets ?? 1,
+      totalGoldTickets: initialData?.totalTickets ?? 1,
+      totalPlatinumTickets: initialData?.totalTickets ?? 1,
     },
   });
 
   async function onSubmit(values: FormData) {
-    if (!user?.id) return;
+    if(!goldChecked){values.gold_price = -1; values.totalGoldTickets = -1}
+    if(!platinumChecked){values.platinum_price = -1; values.totalPlatinumTickets = -1}
 
-    startTransition(async () => {
-      try {
-        let imageStorageId = null;
+    
 
-        // Handle image changes
-        if (selectedImage) {
-          // Upload new image
-          imageStorageId = await handleImageUpload(selectedImage);
-        }
-
-        // Handle image deletion/update in edit mode
-        if (mode === "edit" && initialData?.imageStorageId) {
-          if (removedCurrentImage || selectedImage) {
-            // Delete old image from storage
-            await deleteImage({
-              storageId: initialData.imageStorageId,
-            });
-          }
-        }
-
-        if (mode === "create") {
-          const eventId = await createEvent({
-            ...values,
-            userId: user.id,
-            eventDate: values.eventDate.getTime(),
-          });
-
-          if (imageStorageId) {
-            await updateEventImage({
-              eventId,
-              storageId: imageStorageId as Id<"_storage">,
-            });
-          }
-
-          router.push(`/event/${eventId}`);
-        } else {
-          // Ensure initialData exists before proceeding with update
-          if (!initialData) {
-            throw new Error("Initial event data is required for updates");
-          }
-
-          // Update event details
-          await updateEvent({
-            eventId: initialData._id,
-            ...values,
-            eventDate: values.eventDate.getTime(),
-          });
-
-          // Update image - this will now handle both adding new image and removing existing image
-          if (imageStorageId || removedCurrentImage) {
-            await updateEventImage({
-              eventId: initialData._id,
-              // If we have a new image, use its ID, otherwise if we're removing the image, pass null
-              storageId: imageStorageId
-                ? (imageStorageId as Id<"_storage">)
-                : null,
-            });
-          }
-
-          toast( "Event updated" , {
-            description: "Your event has been successfully updated.",
-          });
-
-          router.push(`/event/${initialData._id}`);
-        }
-      } catch (error) {
-        console.error("Failed to handle event:", error);
-        toast( "Uh oh! Something went wrong." ,{
-            description: "There was a problem with your request.",
-        });
-      }
-    });
+    console.log(values);
+    
   }
 
   async function handleImageUpload(file: File): Promise<string | null> {
@@ -266,47 +210,175 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price per Ticket</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2">
-                      £
-                    </span>
+          
+          <hr />
+          <div className="grid grid-cols-4 gap-4 items-center">
+          <input checked disabled type="checkbox" className="w-5 h-5"/>
+            <p className="font-bold">Silver Tier</p>
+
+            <FormField
+              control={form.control}
+              name="silver_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-normal">Price per Ticket</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                        £
+                      </span>
+                      <Input
+                        defaultValue={0}
+                        min={0}
+                        type="number"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="pl-6"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="totalSilverTickets"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-normal">Total Tickets Available</FormLabel>
+                  <FormControl>
                     <Input
+                      defaultValue={1}
+                      min={1}
                       type="number"
                       {...field}
                       onChange={(e) => field.onChange(Number(e.target.value))}
-                      className="pl-6"
                     />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <hr />
 
-          <FormField
-            control={form.control}
-            name="totalTickets"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Total Tickets Available</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className={`grid grid-cols-4 gap-4 items-center ${goldChecked ? "" : "line-through text-red-500"}`}>
+            
+            <input checked={goldChecked} type="checkbox" className="w-5 h-5" onClick={(e)=>{ 
+              setGoldChecked((e.target as HTMLInputElement).checked);
+            }}/>
+
+            <p className="font-bold">Gold Tier</p>
+
+            <FormField
+              disabled={goldChecked ? false : true}
+              control={form.control}
+              name="gold_price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-normal">Price per Ticket</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                        £
+                      </span>
+                      <Input
+                        defaultValue={0}
+                        min={0}
+                        type="number"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="pl-6"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              disabled={goldChecked ? false : true}
+              control={form.control}
+              name="totalGoldTickets"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-normal">Total Tickets Available</FormLabel>
+                  <FormControl>
+                    <Input
+                      defaultValue={1}
+                      min={1}
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <hr />
+
+          <div className={`grid grid-cols-4 gap-4 items-center ${platinumChecked ? "" : "line-through text-red-500"}`}>
+            
+              <input checked={platinumChecked} type="checkbox" className="w-5 h-5" onClick={(e)=>{ 
+                setPlatinumChecked((e.target as HTMLInputElement).checked);
+              }}/>  
+
+              <p className="font-bold">Platinum Tier</p>
+  
+              <FormField
+                control={form.control}
+                name="platinum_price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-normal">Price per Ticket</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2">
+                          £
+                        </span>
+                        <Input
+                          disabled={platinumChecked ? false : true}
+                          defaultValue={0}
+                          min={0}
+                          type="number"
+                          {...field}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          className="pl-6"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+  
+              <FormField
+                control={form.control}
+                name="totalPlatinumTickets"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-normal">Total Tickets Available</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={platinumChecked ? false : true}
+                        defaultValue={1}
+                        min={1}
+                        type="number"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <hr/>
 
           {/* Image Upload */}
           <div className="space-y-4">
