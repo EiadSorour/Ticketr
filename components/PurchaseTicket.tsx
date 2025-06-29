@@ -87,7 +87,7 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold text-gray-900">
-                            Ticket Reserved
+                            Tickets Reserved
                             </h3>
                             <p className="text-sm text-gray-500">
                             Expires in {timeRemaining}
@@ -95,8 +95,14 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
                         </div>
                     </div>
 
+                    <div className="grid grid-cols-3">
+                      <div><span className="font-bold underline">{queuePosition.silverCount}</span> Silver</div>
+                      <div><span className="font-bold underline">{queuePosition.goldCount}</span> Gold</div>
+                      <div><span className="font-bold underline">{queuePosition.platinumCount}</span> Platinum</div>
+                    </div>
+
                     <div className="text-sm text-gray-600 leading-relaxed">
-                        A ticket has been reserved for you. Complete your purchase before
+                        Tickets have been reserved for you. Complete your purchase before
                         the timer expires to secure your spot at this event.
                     </div>
                 </div>
@@ -109,7 +115,7 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
                 >
                 {isLoading
                     ? "Redirecting to checkout..."
-                    : "Purchase Your Ticket Now →"}
+                    : "Purchase Your Tickets Now →"}
             </button>
 
             <div className="mt-4">

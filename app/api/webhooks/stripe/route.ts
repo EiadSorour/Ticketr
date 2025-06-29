@@ -44,6 +44,9 @@ export async function POST(req: Request) {
       const result = await convex.mutation(api.events.purchaseTicket, {
         eventId: metadata.eventId,
         userId: metadata.userId,
+        silverCount: Number(metadata.silverCount),
+        goldCount: Number(metadata.goldCount),
+        platinumCount: Number(metadata.platinumCount),
         waitingListId: metadata.waitingListId,
         paymentInfo: {
           paymentIntentId: session.payment_intent as string,

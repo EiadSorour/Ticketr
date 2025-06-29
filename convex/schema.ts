@@ -7,8 +7,12 @@ export default defineSchema({
     description: v.string(),
     location: v.string(),
     eventDate: v.number(),
-    price: v.number(),
-    totalTickets: v.number(),
+    silver_price: v.number(),
+    totalSilverTickets: v.number(),
+    gold_price: v.number(),
+    totalGoldTickets: v.number(),
+    platinum_price: v.number(),
+    totalPlatinumTickets: v.number(),
     userId: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
     is_cancelled: v.optional(v.boolean()),
@@ -17,6 +21,9 @@ export default defineSchema({
   tickets: defineTable({
     eventId: v.id("events"),
     userId: v.string(),
+    silverCount: v.number(),
+    goldCount: v.number(),
+    platinumCount: v.number(),
     purchasedAt: v.number(),
     status: v.union(
       v.literal("valid"),
@@ -35,6 +42,9 @@ export default defineSchema({
   waitingList: defineTable({
     eventId: v.id("events"),
     userId: v.string(),
+    silverCount: v.number(),
+    goldCount: v.number(),
+    platinumCount: v.number(),
     status: v.union(
       v.literal("waiting"),
       v.literal("offered"),

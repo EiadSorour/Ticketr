@@ -6,6 +6,7 @@ import { useQuery } from "convex/react";
 import {
   CalendarDays,
   IdCard,
+  ListIcon,
   MapPin,
   Ticket as TicketIcon,
   User,
@@ -25,6 +26,8 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
   if (!ticket || !ticket.event || !user) {
     return <Spinner />;
   }
+
+  const ticketTotalPrice = ((ticket.amount) || 0) / 100;
 
   return (
     <div
@@ -106,15 +109,57 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
               </div>
             </div>
 
+            {/* <div className="flex items-center text-gray-600">
+              <TicketIcon
+                className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
+              />
+              <div>
+                <p className="text-sm text-gray-500">Silver Ticket Price</p>
+                <p className="font-medium">£ {ticket.event.silver_price.toFixed(2)}</p>
+              </div>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <TicketIcon
+                className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
+              />
+              <div>
+                <p className="text-sm text-gray-500">Gold Ticket Price</p>
+                <p className="font-medium">£ {ticket.event.gold_price.toFixed(2)}</p>
+              </div>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <TicketIcon
+                className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
+              />
+              <div>
+                <p className="text-sm text-gray-500">Platinum Ticket Price</p>
+                <p className="font-medium">£ {ticket.event.platinum_price.toFixed(2)}</p>
+              </div>
+            </div> */}
+
             <div className="flex items-center text-gray-600">
               <TicketIcon
                 className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
               />
               <div>
                 <p className="text-sm text-gray-500">Ticket Price</p>
-                <p className="font-medium">£{ticket.event.price.toFixed(2)}</p>
+                <p className="font-medium">£ {ticketTotalPrice?.toFixed(2)}</p>
               </div>
             </div>
+
+            <div className="flex items-center text-gray-600">
+                <ListIcon
+                  className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
+                /> 
+              <div className="grid grid-cols-1">
+                  <p className="text-sm text-gray-500">Includes</p>
+                  <p className="font-medium">{ticket.silverCount > 0 ? `${ticket.silverCount} silver tickets` : ""}</p>
+                  <p className="font-medium">{ticket.goldCount > 0 ? `${ticket.goldCount} gold tickets` : ""}</p>
+                  <p className="font-medium">{ticket.platinumCount > 0 ? `${ticket.platinumCount} platinum tickets` : ""}</p>
+              </div>
+            </div>
+              
+              
           </div>
 
           {/* Right Column - QR Code */}
@@ -125,7 +170,7 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
             <div
               className={`bg-gray-100 p-4 rounded-lg ${ticket.event.is_cancelled ? "opacity-50" : ""}`}
             >
-              <QRCode value={ticket._id} className="w-32 h-32" />
+              <QRCode value={`${process.env.NEXT_PUBLIC_ROOT_URL}/scan/${ticket._id}`} className="w-32 h-32" />
             </div>
             <p className="mt-2 text-sm text-gray-500 break-all text-center max-w-[200px] md:max-w-full">
               Thank you for your purchase 💙

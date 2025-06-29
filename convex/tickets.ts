@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { api } from "./_generated/api";
+import { Doc } from "./_generated/dataModel";
 
 
 export const getUserTicketForEvent = query({
@@ -19,6 +21,7 @@ export const getUserTicketForEvent = query({
     },
 });
 
+// Return both ticket and event details
 export const getTicketWithDetails = query({
   args: { ticketId: v.id("tickets") },
   handler: async (ctx, { ticketId }) => {
@@ -59,5 +62,36 @@ export const updateTicketStatus = mutation({
   },
   handler: async (ctx, { ticketId, status }) => {
     await ctx.db.patch(ticketId, { status });
+  },
+});
+
+export const scanTicket = mutation({
+  args: {ticketId: v.id("tickets")},
+  handler: async (ctx, { ticketId }) => {
+    await ctx.db.patch(ticketId, { status : "used" });
+  },
+});
+
+export const getTicketForScan = query({
+  args: { ticketId: v.id("tickets") },
+  handler: async (ctx, { ticketId }) : Promise<{
+    ticketDetails: Doc<"tickets"> | null;
+    eventDetails: Doc<"events"> | null;
+    userDetails: Doc<"users"> | null;
+  }> => {
+    const ticketDetails = await ctx.db.get(ticketId);
+    var eventDetails = null;
+    var userDetails = null;
+    if(ticketDetails){
+      eventDetails = await ctx.db.get( ticketDetails?.eventId );
+      userDetails = await ctx.runQuery(api.users.getUserById, { userId : ticketDetails.userId });
+    }
+
+    return {
+      ticketDetails,
+      eventDetails,
+      userDetails
+    }
+
   },
 });

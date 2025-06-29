@@ -9,6 +9,7 @@ import Spinner from "./Spinner";
 import { WAITING_LIST_STATUS } from "@/convex/constants";
 import { Clock, OctagonXIcon } from "lucide-react";
 import { Input } from "./ui/input";
+import { useState } from "react";
 
 export default function JoinQueue({
     eventId,
@@ -33,9 +34,34 @@ export default function JoinQueue({
 
     const isEventOwner = userId === event?.userId;
 
+    const [silverCount, setSilverCount] = useState(1);
+    const [goldCount, setGoldCount] = useState(0);
+    const [platinumCount, setPlatinumCount] = useState(0);
+
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const ticketChanged = e.target.name;
+      const wantedTicketCount = e.target.value;
+
+      switch(ticketChanged){
+        case "silver": 
+          setSilverCount(Number(wantedTicketCount));
+          break;
+        case "gold":
+          setGoldCount(Number(wantedTicketCount));
+          break;
+        case "platinum":
+          setPlatinumCount(Number(wantedTicketCount));
+          break;
+      }
+      
+    }
+
+
+    /*** Good ***/
     const handleJoinQueue = async () => {
+      
       try {
-        const result = await joinWaitingList({ eventId, userId });
+        const result = await joinWaitingList({ eventId, userId, silverCount , goldCount, platinumCount });
         if (result.success) {
           console.log("Successfully joined waiting list");
         }
@@ -87,7 +113,9 @@ export default function JoinQueue({
                 <Clock className="w-5 h-5" />
                 <span>Event has ended</span>
               </div>
-            ) : availability.purchasedCount >= availability?.totalTickets ? (
+            ) : ( (availability.silverPurchasedCount >= availability.totalSilverTickets) && 
+                  (availability.goldPurchasedCount >= availability.totalGoldTickets) && 
+                  (availability.platinumPurchasedCount >= availability.totalPlatinumTickets)) ? (
               <div className="text-center p-4">
                 <p className="text-lg font-semibold text-red-600">
                   Sorry, this event is sold out
@@ -95,12 +123,13 @@ export default function JoinQueue({
               </div>
             ) : (
               <div>
-                
+                {/*** Good ***/}
                 {/* ////////////////////////////////////////////// */}
                 <div className="grid grid-cols-1 gap-4 p-3 rounded-2xl border-2 border-gray-200">
                   <div className="grid grid-cols-3 gap-6">
                       <div className="">
-                          <Input type="number" min="0" defaultValue="1" onKeyDown={(e) => e.preventDefault()}/>
+                          {/**Danger */}
+                          <Input value={silverCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} onChange={handleOnChange} name="silver" type="number" min="0" max={availability.totalSilverTickets - availability.silverPurchasedCount} onKeyDown={(e) => e.preventDefault()}/>
                       </div>
 
                       <div className="flex items-center text-gray-600 mb-1">
@@ -111,14 +140,14 @@ export default function JoinQueue({
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                          £{event.price.toFixed(2)}
+                          £{event.silver_price.toFixed(2)}
                           </span>
                       </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-6">
+                  {availability.totalGoldTickets > 0 ? <div className="grid grid-cols-3 gap-6">
                       <div className="">
-                          <Input type="number" min="0" defaultValue="0" onKeyDown={(e) => e.preventDefault()}/>
+                          <Input value={goldCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} onChange={handleOnChange} name="gold" type="number" min="0" max={availability.totalGoldTickets - availability.goldPurchasedCount} onKeyDown={(e) => e.preventDefault()}/>
                       </div>
 
                       <div className="flex items-center text-gray-600 mb-1">
@@ -129,14 +158,15 @@ export default function JoinQueue({
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                          £{event.price.toFixed(2)}
+                            {/*//////////////////////////////////////////////////// */}
+                          £{event.gold_price.toFixed(2)}
                           </span>
                       </div>
-                  </div>
+                  </div> : ""}
 
-                  <div className="grid grid-cols-3 gap-6">
+                  {availability.totalPlatinumTickets > 0 ? <div className="grid grid-cols-3 gap-6">
                       <div className="">
-                          <Input type="number" min="0" defaultValue="0" onKeyDown={(e) => e.preventDefault()}/>
+                          <Input value={platinumCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} onChange={handleOnChange} name="platinum" type="number" min="0" max={availability.totalPlatinumTickets - availability.platinumPurchasedCount} onKeyDown={(e) => e.preventDefault()}/>
                       </div>
 
                       <div className="flex items-center text-gray-600 mb-1">
@@ -147,16 +177,16 @@ export default function JoinQueue({
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                          £{event.price.toFixed(2)}
+                            {/*//////////////////////////////////////////////////// */}
+                          £{event.platinum_price.toFixed(2)}
                           </span>
                       </div>
-                  </div>
+                  </div> : "" }
                 </div>
                 {/* ////////////////////////////////////////////// */}
-
                 <button
                   onClick={handleJoinQueue}
-                  disabled={isPastEvent || isEventOwner}
+                  disabled={isPastEvent || isEventOwner || (silverCount + goldCount + platinumCount === 0)}
                   className="mt-4 w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-md flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   Buy Ticket

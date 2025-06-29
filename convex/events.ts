@@ -3,6 +3,9 @@ import { mutation, query } from "./_generated/server";
 import { DURATIONS, TICKET_STATUS, WAITING_LIST_STATUS } from "./constants";
 import { api, internal } from "./_generated/api";
 
+
+/*** Good ***/
+// Get all events that are not canceled
 export const get = query({
     args: {},
     handler: async (ctx) => {
@@ -13,6 +16,8 @@ export const get = query({
     },
 });
 
+
+/*** Good ***/
 export const getById = query({
     args: { eventId: v.id("events") },
     handler: async (ctx, { eventId }) => {
@@ -20,6 +25,8 @@ export const getById = query({
     },
 });
 
+
+/*** Good ***/
 export const getEventAvailability = query({
     args: { eventId: v.id("events") },
     handler: async (ctx, { eventId }) => {
@@ -27,7 +34,7 @@ export const getEventAvailability = query({
       if (!event) throw new Error("Event not found");
   
       // Count total purchased tickets
-      const purchasedCount = await ctx.db
+      const purchasedTickets = await ctx.db
         .query("tickets")
         .withIndex("by_event", (q) => q.eq("eventId", eventId))
         .collect()
@@ -35,10 +42,22 @@ export const getEventAvailability = query({
           (tickets) =>
             tickets.filter(
               (t) =>
-                t.status === TICKET_STATUS.VALID ||
-                t.status === TICKET_STATUS.USED
-            ).length
+                (t.status === TICKET_STATUS.VALID ||
+                t.status === TICKET_STATUS.USED)
+            )
         );
+
+      var silverPurchasedCount = 0;
+      var goldPurchasedCount = 0;
+      var platinumPurchasedCount = 0;
+
+      purchasedTickets.forEach(ticket => {
+        silverPurchasedCount += ticket.silverCount; 
+        goldPurchasedCount += ticket.goldCount; 
+        platinumPurchasedCount += ticket.platinumCount; 
+      });
+
+
   
       // Count current valid offers
       const now = Date.now();
@@ -49,71 +68,107 @@ export const getEventAvailability = query({
         )
         .collect()
         .then(
-          (entries) => entries.filter((e) => (e.offerExpiresAt ?? 0) > now).length
+          (entries) => entries.filter((e) => (e.offerExpiresAt ?? 0) > now)
         );
+
+      var activeSilverOffers = 0;
+      var activeGoldOffers = 0;
+      var activePlatinumOffers = 0;
+
+      activeOffers.forEach(offer => {
+        activeSilverOffers += offer.silverCount; 
+        activeGoldOffers += offer.goldCount; 
+        activePlatinumOffers += offer.platinumCount; 
+      });
   
-      const totalReserved = purchasedCount + activeOffers;
+      const totalSilverReserved = silverPurchasedCount + activeSilverOffers;
+      const totalGoldReserved = goldPurchasedCount + activeGoldOffers;
+      const totalPlatinumReserved = platinumPurchasedCount + activePlatinumOffers;
   
       return {
-        isSoldOut: totalReserved >= event.totalTickets,
-        totalTickets: event.totalTickets,
-        purchasedCount,
-        activeOffers,
-        remainingTickets: Math.max(0, event.totalTickets - totalReserved),
+        isSilverSoldOut: totalSilverReserved >= event.totalSilverTickets,
+        isGoldSoldOut: totalGoldReserved >= event.totalGoldTickets,
+        isPlatinumSoldOut: totalPlatinumReserved >= event.totalPlatinumTickets,
+        
+        totalSilverTickets: event.totalSilverTickets,
+        totalGoldTickets: event.totalGoldTickets,
+        totalPlatinumTickets: event.totalPlatinumTickets,
+        
+        silverPurchasedCount,
+        goldPurchasedCount,
+        platinumPurchasedCount,
+        
+        activeSilverOffers,
+        activeGoldOffers,
+        activePlatinumOffers,
+        
+        remainingSilverTickets: Math.max(0, event.totalSilverTickets - totalSilverReserved), /////////////////
+        remainingGoldTickets: Math.max(0, event.totalGoldTickets - totalGoldReserved),
+        remainingPlatinumTickets: Math.max(0, event.totalPlatinumTickets - totalPlatinumReserved),
       };
     },
 });
 
+/*
 // Helper function to check ticket availability for an event
-export const checkAvailability = query({
-  args: { eventId: v.id("events") },
-  handler: async (ctx, { eventId }) => {
-    const event = await ctx.db.get(eventId);
-    if (!event) throw new Error("Event not found");
+// export const checkAvailability = query({
+//   args: { eventId: v.id("events") },
+//   handler: async (ctx, { eventId }) => {
+//     const event = await ctx.db.get(eventId);
+//     if (!event) throw new Error("Event not found");
 
-    // Count total purchased tickets
-    const purchasedCount = await ctx.db
-      .query("tickets")
-      .withIndex("by_event", (q) => q.eq("eventId", eventId))
-      .collect()
-      .then(
-        (tickets) =>
-          tickets.filter(
-            (t) =>
-              t.status === TICKET_STATUS.VALID ||
-              t.status === TICKET_STATUS.USED
-          ).length
-      );
+//     // Count total purchased tickets
+//     const purchasedCount = await ctx.db
+//       .query("tickets")
+//       .withIndex("by_event", (q) => q.eq("eventId", eventId))
+//       .collect()
+//       .then(
+//         (tickets) =>
+//           tickets.filter(
+//             (t) =>
+//               t.status === TICKET_STATUS.VALID ||
+//               t.status === TICKET_STATUS.USED
+//           ).length
+//       );
 
-    // Count current valid offers
-    const now = Date.now();
-    const activeOffers = await ctx.db
-      .query("waitingList")
-      .withIndex("by_event_status", (q) =>
-        q.eq("eventId", eventId).eq("status", WAITING_LIST_STATUS.OFFERED)
-      )
-      .collect()
-      .then(
-        (entries) => entries.filter((e) => (e.offerExpiresAt ?? 0) > now).length
-      );
+//     // Count current valid offers
+//     const now = Date.now();
+//     const activeOffers = await ctx.db
+//       .query("waitingList")
+//       .withIndex("by_event_status", (q) =>
+//         q.eq("eventId", eventId).eq("status", WAITING_LIST_STATUS.OFFERED)
+//       )
+//       .collect()
+//       .then(
+//         (entries) => entries.filter((e) => (e.offerExpiresAt ?? 0) > now).length
+//       );
 
-    const availableSpots = event.totalTickets - (purchasedCount + activeOffers);
+//     const availableSpots = event.totalTickets - (purchasedCount + activeOffers);
 
-    return {
-      available: availableSpots > 0,
-      availableSpots,
-      totalTickets: event.totalTickets,
-      purchasedCount,
-      activeOffers,
-    };
-  },
-});
+//     return {
+//       available: availableSpots > 0,
+//       availableSpots,
+//       totalTickets: event.totalTickets,
+//       purchasedCount,
+//       activeOffers,
+//     };
+//   },
+// });
+*/
 
+
+/*** Good ***/
 // Join waiting list for an event
 export const joinWaitingList = mutation({
   // Function takes an event ID and user ID as arguments
-  args: { eventId: v.id("events"), userId: v.string() },
-  handler: async (ctx, { eventId, userId }) => {
+  args: { 
+    eventId: v.id("events"),
+    userId: v.string(),
+    silverCount: v.number(), 
+    goldCount: v.number(), 
+    platinumCount: v.number(), 
+  },
+  handler: async (ctx, { eventId, userId, silverCount, goldCount, platinumCount }) => {
     // Rate limit check
     // const status = await rateLimiter.limit(ctx, "queueJoin", { key: userId });
     // if (!status.ok) {
@@ -145,15 +200,41 @@ export const joinWaitingList = mutation({
 
     // Check if there are any available tickets right now
     // Use the function reference from the api object for ctx.runQuery
-    const {available} : any = await ctx.runQuery(api.events.checkAvailability, { eventId });
+    const availability : {
+      isSilverSoldOut: boolean,
+      isGoldSoldOut: boolean,
+      isPlatinumSoldOut: boolean,
+      
+      totalSilverTickets: number,
+      totalGoldTickets: number,
+      totalPlatinumTickets: number,
+      
+      silverPurchasedCount: number,
+      goldPurchasedCount: number,
+      platinumPurchasedCount: number,
+      
+      activeSilverOffers: number,
+      activeGoldOffers: number,
+      activePlatinumOffers: number,
+      
+      remainingSilverTickets: number,
+      remainingGoldTickets: number,
+      remainingPlatinumTickets: number,
+    } = await ctx.runQuery(api.events.getEventAvailability, { eventId });
 
     const now = Date.now();
+
+    // Check if all silver,gold and platinum tickets are available for the user
+    const available : boolean = ( (silverCount <= availability.remainingSilverTickets) && (goldCount <= availability.remainingGoldTickets) && (platinumCount <= availability.remainingPlatinumTickets) );
 
     if (available) {
       // If tickets are available, create an offer entry
       const waitingListId = await ctx.db.insert("waitingList", {
         eventId,
         userId,
+        silverCount,
+        goldCount,
+        platinumCount,
         status: WAITING_LIST_STATUS.OFFERED, // Mark as offered
         offerExpiresAt: now + DURATIONS.TICKET_OFFER, // Set expiration time
       });
@@ -172,6 +253,9 @@ export const joinWaitingList = mutation({
       await ctx.db.insert("waitingList", {
         eventId,
         userId,
+        silverCount,
+        goldCount,
+        platinumCount,
         status: WAITING_LIST_STATUS.WAITING, // Mark as waiting
       });
     }
@@ -189,14 +273,19 @@ export const joinWaitingList = mutation({
   },
 });
 
+/*** Good ***/
 export const create = mutation({
   args: {
     name: v.string(),
     description: v.string(),
     location: v.string(),
     eventDate: v.number(), // Store as timestamp
-    price: v.number(),
-    totalTickets: v.number(),
+    silver_price: v.number(),
+    totalSilverTickets: v.number(),
+    gold_price: v.number(),
+    totalGoldTickets: v.number(),
+    platinum_price: v.number(),
+    totalPlatinumTickets: v.number(),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
@@ -205,63 +294,35 @@ export const create = mutation({
       description: args.description,
       location: args.location,
       eventDate: args.eventDate,
-      price: args.price,
-      totalTickets: args.totalTickets,
+      silver_price: args.silver_price,
+      totalSilverTickets: args.totalSilverTickets,
+      gold_price: args.gold_price,
+      totalGoldTickets: args.totalGoldTickets,
+      platinum_price: args.platinum_price,
+      totalPlatinumTickets: args.totalPlatinumTickets,
       userId: args.userId,
     });
     return eventId;
   },
 });
 
-export const updateEvent = mutation({
-  args: {
-    eventId: v.id("events"),
-    name: v.string(),
-    description: v.string(),
-    location: v.string(),
-    eventDate: v.number(),
-    price: v.number(),
-    totalTickets: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const { eventId, ...updates } = args;
 
-    // Get current event to check tickets sold
-    const event = await ctx.db.get(eventId);
-    if (!event) throw new Error("Event not found");
-
-    const soldTickets = await ctx.db
-      .query("tickets")
-      .withIndex("by_event", (q) => q.eq("eventId", eventId))
-      .filter((q) =>
-        q.or(q.eq(q.field("status"), "valid"), q.eq(q.field("status"), "used"))
-      )
-      .collect();
-
-    // Ensure new total tickets is not less than sold tickets
-    if (updates.totalTickets < soldTickets.length) {
-      throw new Error(
-        `Cannot reduce total tickets below ${soldTickets.length} (number of tickets already sold)`
-      );
-    }
-
-    await ctx.db.patch(eventId, updates);
-    return eventId;
-  },
-});
-
+/*** Good ***/
 // Purchase ticket
 export const purchaseTicket = mutation({
   args: {
     eventId: v.id("events"),
     userId: v.string(),
     waitingListId: v.id("waitingList"),
+    silverCount: v.number(),
+    goldCount: v.number(),
+    platinumCount: v.number(),
     paymentInfo: v.object({
       paymentIntentId: v.string(),
       amount: v.number(),
     }),
   },
-  handler: async (ctx, { eventId, userId, waitingListId, paymentInfo }) => {
+  handler: async (ctx, { eventId, userId, waitingListId, silverCount, goldCount, platinumCount, paymentInfo }) => {
     console.log("Starting purchaseTicket handler", {
       eventId,
       userId,
@@ -314,6 +375,9 @@ export const purchaseTicket = mutation({
       await ctx.db.insert("tickets", {
         eventId,
         userId,
+        silverCount, 
+        goldCount,
+        platinumCount,
         purchasedAt: Date.now(),
         status: TICKET_STATUS.VALID,
         paymentIntentId: paymentInfo.paymentIntentId,
@@ -337,6 +401,8 @@ export const purchaseTicket = mutation({
   },
 });
 
+
+/*** Good ***/
 // Get user's tickets with event information
 export const getUserTickets = query({
   args: { userId: v.string() },
@@ -360,6 +426,8 @@ export const getUserTickets = query({
   },
 });
 
+
+/*** Good ***/
 export const search = query({
   args: { searchTerm: v.string() },
   handler: async (ctx, { searchTerm }) => {
@@ -379,55 +447,74 @@ export const search = query({
   },
 });
 
-export type Metrics = {
-  soldTickets: number;
-  refundedTickets: number;
-  cancelledTickets: number;
-  revenue: number;
-};
 
-export const getSellerEvents = query({
-  args: { userId: v.string() },
-  handler: async (ctx, { userId }) => {
-    const events = await ctx.db
-      .query("events")
-      .filter((q) => q.eq(q.field("userId"), userId))
+export const updateEvent = mutation({
+  args: {
+    eventId: v.id("events"),
+    name: v.string(),
+    description: v.string(),
+    location: v.string(),
+    eventDate: v.number(),
+    silver_price: v.number(),
+    totalSilverTickets: v.number(),
+    gold_price: v.number(),
+    totalGoldTickets: v.number(),
+    platinum_price: v.number(),
+    totalPlatinumTickets: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { eventId, ...updates } = args;
+
+    // Get current event to check tickets sold
+    const event = await ctx.db.get(eventId);
+    if (!event) throw new Error("Event not found");
+
+    const soldTickets = await ctx.db
+      .query("tickets")
+      .withIndex("by_event", (q) => q.eq("eventId", eventId))
+      .filter((q) =>
+        q.or(q.eq(q.field("status"), "valid"), q.eq(q.field("status"), "used"))
+      )
       .collect();
 
-    // For each event, get ticket sales data
-    const eventsWithMetrics = await Promise.all(
-      events.map(async (event) => {
-        const tickets = await ctx.db
-          .query("tickets")
-          .withIndex("by_event", (q) => q.eq("eventId", event._id))
-          .collect();
+    var soldSilverTickets = 0;
+    var soldGoldTickets = 0;
+    var soldPlatinumTickets = 0;
 
-        const validTickets = tickets.filter(
-          (t) => t.status === "valid" || t.status === "used"
-        );
-        const refundedTickets = tickets.filter((t) => t.status === "refunded");
-        const cancelledTickets = tickets.filter(
-          (t) => t.status === "cancelled"
-        );
+    soldTickets.forEach(ticket => {
+      soldSilverTickets += ticket.silverCount;
+      soldGoldTickets += ticket.goldCount;
+      soldPlatinumTickets += ticket.platinumCount;
+    });
 
-        const metrics: Metrics = {
-          soldTickets: validTickets.length,
-          refundedTickets: refundedTickets.length,
-          cancelledTickets: cancelledTickets.length,
-          revenue: validTickets.length * event.price,
-        };
+    // Ensure new total tickets is not less than sold tickets
+    if (updates.totalSilverTickets < soldSilverTickets) {
+      throw new Error(
+        `Cannot reduce total silver tickets below ${soldSilverTickets} (number of tickets already sold)`
+      );
+    }
+    if (updates.totalGoldTickets < soldGoldTickets) {
+      throw new Error(
+        `Cannot reduce total gold tickets below ${soldGoldTickets} (number of tickets already sold)`
+      );
+    }
+    if (updates.totalPlatinumTickets < soldPlatinumTickets) {
+      throw new Error(
+        `Cannot reduce total platinum tickets below ${soldPlatinumTickets} (number of tickets already sold)`
+      );
+    }
 
-        return {
-          ...event,
-          metrics,
-        };
-      })
-    );
+    await ctx.db.patch(eventId, updates);
 
-    return eventsWithMetrics;
+    // TODO
+    await ctx.runMutation(api.waitingList.clearEventWaitingAfterUpdate, { eventId });
+
+    return eventId;
   },
 });
 
+
+/*** Good ***/
 export const cancelEvent = mutation({
   args: { eventId: v.id("events") },
   handler: async (ctx, { eventId }) => {
@@ -467,3 +554,85 @@ export const cancelEvent = mutation({
     return { success: true };
   },
 });
+
+
+/*** Good ***/
+export type Metrics = {
+  soldSilverTickets: number,
+  soldGoldTickets: number,
+  soldPlatinumTickets: number,
+  refundedSilverTickets: number;
+  refundedGoldTickets: number;
+  refundedPlatinumTickets: number;
+  revenue: number;
+};
+
+
+/*** Good ***/
+export const getSellerEvents = query({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    const events = await ctx.db
+      .query("events")
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .collect();
+
+    // For each event, get ticket sales data
+    const eventsWithMetrics = await Promise.all(
+      events.map(async (event) => {
+        const tickets = await ctx.db
+          .query("tickets")
+          .withIndex("by_event", (q) => q.eq("eventId", event._id))
+          .collect();
+
+        const validTickets = tickets.filter(
+          (t) => t.status === "valid" || t.status === "used"
+        );
+        const refundedTickets = tickets.filter((t) => t.status === "refunded");
+        const cancelledTickets = tickets.filter(
+          (t) => t.status === "cancelled"
+        );
+
+        var soldSilverTickets = 0;
+        var soldGoldTickets = 0;
+        var soldPlatinumTickets = 0;
+
+        validTickets.forEach(ticket => {
+          soldSilverTickets += ticket.silverCount;
+          soldGoldTickets += ticket.goldCount;
+          soldPlatinumTickets += ticket.platinumCount;
+        });
+
+        var refundedSilverTickets = 0;
+        var refundedGoldTickets = 0;
+        var refundedPlatinumTickets = 0;
+
+        refundedTickets.forEach(ticket => {
+          refundedSilverTickets += ticket.silverCount;
+          refundedGoldTickets += ticket.goldCount;
+          refundedPlatinumTickets += ticket.platinumCount;
+        });
+
+        const revenue = (soldSilverTickets * event.silver_price) + (soldGoldTickets * event.gold_price) + (soldPlatinumTickets * event.platinum_price);
+
+        const metrics: Metrics = {
+          soldSilverTickets,
+          soldGoldTickets,
+          soldPlatinumTickets,
+          refundedSilverTickets,
+          refundedGoldTickets,
+          refundedPlatinumTickets,
+          revenue,
+        };
+
+        return {
+          ...event,
+          metrics,
+        };
+      })
+    );
+
+    return eventsWithMetrics;
+  },
+});
+

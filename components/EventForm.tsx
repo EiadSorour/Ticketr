@@ -18,7 +18,7 @@ import { useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { Id } from "@/convex/_generated/dataModel";
 import { Loader2 } from "lucide-react";
@@ -39,9 +39,9 @@ const formSchema = z.object({
   silver_price: z.number().min(0, "Price must be 0 or greater"),
   gold_price: z.number().min(0, "Price must be 0 or greater"),
   platinum_price: z.number().min(0, "Price must be 0 or greater"),
-  totalSilverTickets: z.number().min(1, "Must have at least 1 ticket"),
-  totalGoldTickets: z.number().min(1, "Must have at least 1 ticket"),
-  totalPlatinumTickets: z.number().min(1, "Must have at least 1 ticket"),
+  totalSilverTickets: z.number().min(0, "Must have at least 1 ticket"),
+  totalGoldTickets: z.number().min(0, "Must have at least 1 ticket"),
+  totalPlatinumTickets: z.number().min(0, "Must have at least 1 ticket"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -52,8 +52,12 @@ interface InitialEventData {
   description: string;
   location: string;
   eventDate: number;
-  price: number;
-  totalTickets: number;
+  silver_price: number;
+  totalSilverTickets: number;
+  gold_price: number;
+  totalGoldTickets: number;
+  platinum_price: number;
+  totalPlatinumTickets: number;
   imageStorageId?: Id<"_storage">;
 }
 
@@ -89,20 +93,103 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
       description: initialData?.description ?? "",
       location: initialData?.location ?? "",
       eventDate: initialData ? new Date(initialData.eventDate) : new Date(),
-      silver_price: initialData?.price ?? 0,
-      gold_price: initialData?.price ?? 0,
-      platinum_price: initialData?.price ?? 0,
-      totalSilverTickets: initialData?.totalTickets ?? 1,
-      totalGoldTickets: initialData?.totalTickets ?? 1,
-      totalPlatinumTickets: initialData?.totalTickets ?? 1,
+      silver_price: initialData?.silver_price ?? 0,
+      gold_price: initialData?.gold_price ?? 0,
+      platinum_price: initialData?.platinum_price ?? 0,
+      totalSilverTickets: initialData?.totalSilverTickets ?? 1,
+      totalGoldTickets: initialData?.totalGoldTickets ?? 1,
+      totalPlatinumTickets: initialData?.totalPlatinumTickets ?? 1,
     },
   });
 
-  async function onSubmit(values: FormData) {
-    if(!goldChecked){values.gold_price = -1; values.totalGoldTickets = -1}
-    if(!platinumChecked){values.platinum_price = -1; values.totalPlatinumTickets = -1}
+  
 
+  useEffect(() => {
+    if(initialData){
+      setGoldChecked(initialData?.totalGoldTickets > 0);
+      setPlatinumChecked(initialData?.totalPlatinumTickets > 0);
+    }
+    // return () => clearInterval(interval);
+  }, []);
+
+  async function onSubmit(values: FormData) {
+    if(!goldChecked){values.gold_price = 0; values.totalGoldTickets = 0}
+    if(!platinumChecked){values.platinum_price = 0; values.totalPlatinumTickets = 0}
     
+    if (!user?.id) return;
+
+    startTransition(async () => {
+      try {
+        let imageStorageId = null;
+
+        // Handle image changes
+        if (selectedImage) {
+          // Upload new image
+          imageStorageId = await handleImageUpload(selectedImage);
+        }
+
+        // Handle image deletion/update in edit mode
+        if (mode === "edit" && initialData?.imageStorageId) {
+          if (removedCurrentImage || selectedImage) {
+            // Delete old image from storage
+            await deleteImage({
+              storageId: initialData.imageStorageId,
+            });
+          }
+        }
+
+        if (mode === "create") {
+          const eventId = await createEvent({
+            ...values,
+            userId: user.id,
+            eventDate: values.eventDate.getTime(),
+          });
+
+          if (imageStorageId) {
+            await updateEventImage({
+              eventId,
+              storageId: imageStorageId as Id<"_storage">,
+            });
+          }
+
+          router.push(`/event/${eventId}`);
+        } else {
+          // Ensure initialData exists before proceeding with update
+          if (!initialData) {
+            throw new Error("Initial event data is required for updates");
+          }
+
+          // Update event details
+          await updateEvent({
+            eventId: initialData._id,
+            ...values,
+            eventDate: values.eventDate.getTime(),
+          });
+
+          // Update image - this will now handle both adding new image and removing existing image
+          if (imageStorageId || removedCurrentImage) {
+            await updateEventImage({
+              eventId: initialData._id,
+              // If we have a new image, use its ID, otherwise if we're removing the image, pass null
+              storageId: imageStorageId
+                ? (imageStorageId as Id<"_storage">)
+                : null,
+            });
+          }
+
+          toast( "Event updated" , {
+            description: "Your event has been successfully updated.",
+          });
+
+          router.push(`/event/${initialData._id}`);
+        }
+      } catch (error) {
+        console.error("Failed to handle event:", error);
+        toast( "Uh oh! Something went wrong." ,{
+            description: "There was a problem with your request.",
+        });
+      }
+    });
 
     console.log(values);
     
@@ -228,7 +315,6 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                         £
                       </span>
                       <Input
-                        defaultValue={0}
                         min={0}
                         type="number"
                         {...field}
@@ -250,7 +336,6 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                   <FormLabel className="font-normal">Total Tickets Available</FormLabel>
                   <FormControl>
                     <Input
-                      defaultValue={1}
                       min={1}
                       type="number"
                       {...field}
@@ -266,7 +351,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
 
           <div className={`grid grid-cols-4 gap-4 items-center ${goldChecked ? "" : "line-through text-red-500"}`}>
             
-            <input checked={goldChecked} type="checkbox" className="w-5 h-5" onClick={(e)=>{ 
+            <input checked={goldChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
               setGoldChecked((e.target as HTMLInputElement).checked);
             }}/>
 
@@ -285,7 +370,6 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                         £
                       </span>
                       <Input
-                        defaultValue={0}
                         min={0}
                         type="number"
                         {...field}
@@ -308,7 +392,6 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                   <FormLabel className="font-normal">Total Tickets Available</FormLabel>
                   <FormControl>
                     <Input
-                      defaultValue={1}
                       min={1}
                       type="number"
                       {...field}
@@ -324,7 +407,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
 
           <div className={`grid grid-cols-4 gap-4 items-center ${platinumChecked ? "" : "line-through text-red-500"}`}>
             
-              <input checked={platinumChecked} type="checkbox" className="w-5 h-5" onClick={(e)=>{ 
+              <input checked={platinumChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
                 setPlatinumChecked((e.target as HTMLInputElement).checked);
               }}/>  
 
@@ -343,7 +426,6 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                         </span>
                         <Input
                           disabled={platinumChecked ? false : true}
-                          defaultValue={0}
                           min={0}
                           type="number"
                           {...field}
@@ -366,7 +448,6 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                     <FormControl>
                       <Input
                         disabled={platinumChecked ? false : true}
-                        defaultValue={1}
                         min={1}
                         type="number"
                         {...field}

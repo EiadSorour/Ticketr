@@ -11,6 +11,9 @@ import { DURATIONS } from "@/convex/constants";
 export type StripeCheckoutMetaData = {
   eventId: Id<"events">;
   userId: string;
+  silverCount: string;
+  goldCount: string;
+  platinumCount: string;
   waitingListId: Id<"waitingList">;
 };
 
@@ -56,30 +59,68 @@ export async function createStripeCheckoutSession({
   const metadata: StripeCheckoutMetaData = {
     eventId,
     userId,
+    silverCount: queuePosition.silverCount.toString(),
+    goldCount: queuePosition.goldCount.toString(),
+    platinumCount: queuePosition.platinumCount.toString(),
     waitingListId: queuePosition._id,
   };
+
+  const totalPrice = (queuePosition.silverCount * event.silver_price * 100) + 
+                    (queuePosition.goldCount * event.gold_price * 100) + 
+                    (queuePosition.platinumCount * event.platinum_price * 100)
+
+  const fee = 0.01;    // 1% fee for the patform owner on every single transaction
+
+  const items = [
+    {
+      price_data: {
+        currency: "gbp",
+        product_data: {
+          name: "Silver Tickets"
+        },
+        unit_amount: Math.round(event.silver_price * 100),
+      },
+      quantity: queuePosition.silverCount,
+    }
+  ];
+  if(queuePosition.goldCount > 0){
+    items.push(
+      {
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: "Gold Tickets"
+          },
+          unit_amount: Math.round(event.gold_price * 100),
+        },
+        quantity: queuePosition.goldCount,
+      }
+    )
+  }
+  if(queuePosition.platinumCount > 0){
+    items.push(
+      {
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: "Platinum Tickets"
+          },
+          unit_amount: Math.round(event.platinum_price * 100),
+        },
+        quantity: queuePosition.platinumCount,
+      }
+    )
+  }
 
   // Create Stripe Checkout Session
   const session = await stripe.checkout.sessions.create(
     {
       payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "gbp",
-            product_data: {
-              name: event.name,
-              description: event.description,
-            },
-            unit_amount: Math.round(event.price * 100),
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: items,
       payment_intent_data: {
-        application_fee_amount: Math.round(event.price * 100 * 0.01), // 1% fee for the patform owner on every single transaction
+        application_fee_amount: Math.round(totalPrice * fee), 
       },
-      expires_at: Math.floor(Date.now() / 1000) + DURATIONS.TICKET_OFFER / 1000, // 30 minutes (stripe checkout minimum expiration time)
+      expires_at: Math.floor(Date.now() / 1000) + (30 * 60),
       mode: "payment",
       success_url: `${baseUrl}/tickets/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/event/${eventId}`,

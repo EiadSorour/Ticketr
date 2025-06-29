@@ -84,7 +84,11 @@ function Page(){
                                             <Ticket className="w-5 h-5 mr-2 text-blue-600" />
                                             <span className="text-sm font-medium">Price</span>
                                         </div>
-                                        <p className="text-gray-900">£{event.price.toFixed(2)}</p>
+                                        <p className="text-gray-900">
+                                            £{event.silver_price.toFixed(2)} - 
+                                            £{event.platinum_price != 0 ? event.platinum_price.toFixed(2) : 
+                                                event.gold_price != 0 ? event.gold_price.toFixed(2) : event.silver_price.toFixed(2)}
+                                        </p>
                                     </div>
 
                                     <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
@@ -93,9 +97,20 @@ function Page(){
                                             <span className="text-sm font-medium">Availability</span>
                                         </div>
                                         <p className="text-gray-900">
-                                            {availability.totalTickets - availability.purchasedCount}{" "}
-                                            / {availability.totalTickets} left
+                                            Silver {" "}
+                                            {availability.totalSilverTickets - availability.silverPurchasedCount} /{" "}
+                                            {availability.totalSilverTickets} left
                                         </p>
+                                        {availability.totalGoldTickets > 0 ? <p className="text-gray-900">
+                                            Gold {" "}
+                                            {availability.totalGoldTickets - availability.goldPurchasedCount} /{" "}
+                                            {availability.totalGoldTickets} left
+                                        </p> : ""}
+                                        {availability.totalPlatinumTickets > 0 ? <p className="text-gray-900">
+                                            Platinum {" "}
+                                            {availability.totalPlatinumTickets - availability.platinumPurchasedCount} /{" "}
+                                            {availability.totalPlatinumTickets} left 
+                                        </p> : ""}
                                     </div>
                                 </div>
 

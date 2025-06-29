@@ -8,7 +8,9 @@ import { redirect, useParams } from "next/navigation";
 import Ticket from "@/components/Ticket";
 import Link from "next/link";
 import { ArrowLeft, Download, Share2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas-pro";
 
 export default function TicketPage() {
   const params = useParams();
@@ -16,6 +18,8 @@ export default function TicketPage() {
   const ticket = useQuery(api.tickets.getTicketWithDetails, {
     ticketId: params.id as Id<"tickets">,
   });
+
+  const ticketRef = useRef(null);
 
   useEffect(() => {
     if (!user) {
@@ -35,6 +39,61 @@ export default function TicketPage() {
     return null;
   }
 
+  async function handleSave(){
+    const inputData = ticketRef.current;
+    
+    try{
+      const canvas = await html2canvas(inputData!);
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: "a4"
+      })
+
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+
+      pdf.addImage(imgData , "PNG", 0, 0, width, height);    
+      pdf.save("Ticket.pdf");
+
+    }catch(e){
+      console.log(e);
+    }
+  }
+
+  async function handleShare() {
+    const inputData = ticketRef.current;
+
+    if (!navigator.share) {
+      alert("Web Share API is not supported in your browser.");
+      return;
+    }
+
+    try {
+      const canvas = await html2canvas(inputData!);
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+
+      if (!blob) {
+        console.error("Failed to create Blob from canvas.");
+        return;
+      }
+
+      const file = new File([blob], "Ticket.png", { type: "image/png" });
+      const shareData = {
+        files: [file],
+      };
+
+      await navigator.share(shareData);
+      console.log("Ticket shared successfully!");
+    } catch (error) {
+      console.error("Error sharing ticket:", error);
+    }
+  }
+
+  
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -49,11 +108,11 @@ export default function TicketPage() {
               Back to My Tickets
             </Link>
             <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
+              <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
                 <Download className="w-4 h-4" />
                 <span className="text-sm">Save</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
+              <button onClick={handleShare} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
                 <Share2 className="w-4 h-4" />
                 <span className="text-sm">Share</span>
               </button>
@@ -95,7 +154,7 @@ export default function TicketPage() {
         </div>
 
         {/* Ticket Component */}
-        <Ticket ticketId={ticket._id} />
+        <div ref={ticketRef}><Ticket ticketId={ticket._id} /></div>
 
         {/* Additional Information */}
         <div

@@ -121,19 +121,20 @@ function SellerEventCard({
                 )}
               </div>
             </div>
-
+            
+            {/*////////////////////////////////////////////////////////////////////////*/}
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-gray-50 p-3 rounded-lg">
                 <div className="flex items-center gap-2 text-gray-600 mb-1">
                   <Ticket className="w-4 h-4" />
                   <span className="text-sm font-medium">
-                    {event.is_cancelled ? "Tickets Refunded" : "Tickets Sold"}
+                    {event.is_cancelled ? "Silver Tickets Refunded" : "Silver Tickets Sold"}
                   </span>
                 </div>
                 <p className="text-2xl font-semibold text-gray-900">
                   {event.is_cancelled ? (
                     <>
-                      {event.metrics.refundedTickets}
+                      {event.metrics.refundedSilverTickets}
                       <span className="text-sm text-gray-500 font-normal">
                         {" "}
                         refunded
@@ -141,14 +142,69 @@ function SellerEventCard({
                     </>
                   ) : (
                     <>
-                      {event.metrics.soldTickets}
+                      {event.metrics.soldSilverTickets}
                       <span className="text-sm text-gray-500 font-normal">
-                        /{event.totalTickets}
+                        /{event.totalSilverTickets}
                       </span>
                     </>
                   )}
                 </p>
               </div>
+
+              {event.totalGoldTickets > 0 ? <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <Ticket className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {event.is_cancelled ? "Gold Tickets Refunded" : "Gold Tickets Sold"}
+                  </span>
+                </div>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {event.is_cancelled ? (
+                    <>
+                      {event.metrics.refundedGoldTickets}
+                      <span className="text-sm text-gray-500 font-normal">
+                        {" "}
+                        refunded
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {event.metrics.soldGoldTickets}
+                      <span className="text-sm text-gray-500 font-normal">
+                        /{event.totalGoldTickets}
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div> : ""}
+
+              {event.totalPlatinumTickets > 0 ? <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-gray-600 mb-1">
+                  <Ticket className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {event.is_cancelled ? "Platinum Tickets Refunded" : "Platinum Tickets Sold"}
+                  </span>
+                </div>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {event.is_cancelled ? (
+                    <>
+                      {event.metrics.refundedPlatinumTickets}
+                      <span className="text-sm text-gray-500 font-normal">
+                        {" "}
+                        refunded
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {event.metrics.soldPlatinumTickets}
+                      <span className="text-sm text-gray-500 font-normal">
+                        /{event.totalPlatinumTickets}
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div> : ""}
+              {/*////////////////////////////////////////////////////////////////////////*/}
 
               <div className="bg-gray-50 p-3 rounded-lg">
                 <div className="flex items-center gap-2 text-gray-600 mb-1">
@@ -160,7 +216,9 @@ function SellerEventCard({
                 <p className="text-2xl font-semibold text-gray-900">
                   £
                   {event.is_cancelled
-                    ? event.metrics.refundedTickets * event.price
+                    ? ((event.metrics.refundedSilverTickets * event.silver_price) + 
+                        (event.metrics.refundedGoldTickets * event.gold_price) + 
+                        (event.metrics.refundedPlatinumTickets * event.platinum_price))
                     : event.metrics.revenue}
                 </p>
               </div>

@@ -37,7 +37,9 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
     const renderQueuePosition = () => {
         if (!queuePosition || queuePosition.status !== "waiting") return null;
     
-        if (availability.purchasedCount >= availability.totalTickets) {
+        if (( (availability.silverPurchasedCount >= availability.totalSilverTickets) && 
+              (availability.goldPurchasedCount >= availability.totalGoldTickets) && 
+              (availability.platinumPurchasedCount >= availability.totalPlatinumTickets))) {
           return (
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center">
@@ -60,7 +62,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
               </div>
               <div className="flex items-center">
                 <LoaderCircle className="w-4 h-4 mr-1 animate-spin text-amber-500" />
-                <span className="text-amber-600 text-sm">Waiting for ticket</span>
+                <span className="text-amber-600 text-sm">Waiting for tickets</span>
               </div>
             </div>
           );
@@ -194,9 +196,14 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
                       : "bg-green-50 text-green-700"
                   }`}
                 >
-                  £{event.price.toFixed(2)} - £{event.price.toFixed(2)}
+                  £{event.silver_price.toFixed(2)} 
+                  {event.platinum_price != 0 ? ` - £${event.platinum_price.toFixed(2)}` : 
+                    event.gold_price != 0 ? ` - £${event.gold_price.toFixed(2)}` : ""
+                  }
                 </span>
-                {availability.purchasedCount >= availability.totalTickets && (
+                {( (availability.silverPurchasedCount >= availability.totalSilverTickets) && 
+                  (availability.goldPurchasedCount >= availability.totalGoldTickets) && 
+                  (availability.platinumPurchasedCount >= availability.totalPlatinumTickets)) && (
                   <span className="px-4 py-1.5 bg-red-50 text-red-700 font-semibold rounded-full text-sm">
                     Sold Out
                   </span>
@@ -222,17 +229,45 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
               <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
-                  {availability.totalTickets - availability.purchasedCount} /{" "}
-                  {availability.totalTickets} available
-                  {!isPastEvent && availability.activeOffers > 0 && (
+                  Silver {" "}
+                  {availability.totalSilverTickets - availability.silverPurchasedCount} /{" "}
+                  {availability.totalSilverTickets} available
+                  {!isPastEvent && availability.activeSilverOffers > 0 && (
                     <span className="text-amber-600 text-sm ml-2">
-                      ({availability.activeOffers}{" "}
-                      {availability.activeOffers === 1 ? "person" : "people"} trying
-                      to buy)
+                      ({availability.activeSilverOffers}{" "}
+                      {availability.activeSilverOffers === 1 ? "ticket" : "tickets"} are being purchased)
                     </span>
                   )}
                 </span>
               </div>
+              {availability.totalGoldTickets > 0 ? <div className="flex items-center text-gray-600">
+                <Ticket className="w-4 h-4 mr-2" />
+                <span>
+                  Gold {" "}
+                  {availability.totalGoldTickets - availability.goldPurchasedCount} /{" "}
+                  {availability.totalGoldTickets} available
+                  {!isPastEvent && availability.activeGoldOffers > 0 && (
+                    <span className="text-amber-600 text-sm ml-2">
+                      ({availability.activeGoldOffers}{" "}
+                      {availability.activeGoldOffers === 1 ? "ticket" : "tickets"} are being purchased)
+                    </span>
+                  )}
+                </span>
+              </div> : ""}
+              {availability.totalPlatinumTickets > 0 ? <div className="flex items-center text-gray-600">
+                <Ticket className="w-4 h-4 mr-2" />
+                <span>
+                  Platinum {" "}
+                  {availability.totalPlatinumTickets - availability.platinumPurchasedCount} /{" "}
+                  {availability.totalPlatinumTickets} available
+                  {!isPastEvent && availability.activePlatinumOffers > 0 && (
+                    <span className="text-amber-600 text-sm ml-2">
+                      ({availability.activePlatinumOffers}{" "}
+                      {availability.activePlatinumOffers === 1 ? "ticket" : "tickets"} are being purchased)
+                    </span>
+                  )}
+                </span>
+              </div> : ""}
             </div>
     
             <p className="mt-4 text-gray-600 text-sm line-clamp-2">
