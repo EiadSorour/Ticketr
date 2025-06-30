@@ -74,7 +74,10 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
         return null;
     }
 
-
+    var girdColms = 0;
+    if(queuePosition.silverCount > 0){girdColms++;}
+    if(queuePosition.goldCount > 0){girdColms++;}
+    if(queuePosition.platinumCount > 0){girdColms++;}
     
     return ( 
     <div className="bg-white p-6 rounded-xl shadow-lg border border-amber-200">
@@ -95,10 +98,16 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3">
-                      <div><span className="font-bold underline">{queuePosition.silverCount}</span> Silver</div>
-                      <div><span className="font-bold underline">{queuePosition.goldCount}</span> Gold</div>
-                      <div><span className="font-bold underline">{queuePosition.platinumCount}</span> Platinum</div>
+                    <div className={`grid grid-cols-${girdColms} justify-items-center`}>
+                      { queuePosition.silverCount > 0 ?
+                        <div><span className="font-bold underline">{queuePosition.silverCount}</span> Silver</div>
+                      : ""}
+                      {queuePosition.goldCount > 0 ? 
+                        <div><span className="font-bold underline">{queuePosition.goldCount}</span> Gold</div>
+                      : ""}
+                      {queuePosition.platinumCount > 0 ?
+                        <div><span className="font-bold underline">{queuePosition.platinumCount}</span> Platinum</div>
+                      : ""}
                     </div>
 
                     <div className="text-sm text-gray-600 leading-relaxed">

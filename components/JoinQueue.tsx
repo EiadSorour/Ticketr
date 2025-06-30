@@ -10,6 +10,7 @@ import { WAITING_LIST_STATUS } from "@/convex/constants";
 import { Clock, OctagonXIcon } from "lucide-react";
 import { Input } from "./ui/input";
 import { useState } from "react";
+import { Button } from "./ui/button";
 
 export default function JoinQueue({
     eventId,
@@ -38,25 +39,6 @@ export default function JoinQueue({
     const [goldCount, setGoldCount] = useState(0);
     const [platinumCount, setPlatinumCount] = useState(0);
 
-    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const ticketChanged = e.target.name;
-      const wantedTicketCount = e.target.value;
-
-      switch(ticketChanged){
-        case "silver": 
-          setSilverCount(Number(wantedTicketCount));
-          break;
-        case "gold":
-          setGoldCount(Number(wantedTicketCount));
-          break;
-        case "platinum":
-          setPlatinumCount(Number(wantedTicketCount));
-          break;
-      }
-      
-    }
-
-
     /*** Good ***/
     const handleJoinQueue = async () => {
       
@@ -83,6 +65,45 @@ export default function JoinQueue({
         }
       }
     };
+
+    const handleIncTicket = (e : React.MouseEvent<HTMLButtonElement>)=>{
+      const targetTicket = e.currentTarget.name;
+      
+      if(targetTicket === "silver"){
+        const maxSilver = availability!.totalSilverTickets - availability!.silverPurchasedCount;
+        if(silverCount < maxSilver){
+          setSilverCount( (prev)=>{return prev+=1} )
+        }
+      }
+      if(targetTicket === "gold"){
+        const maxGold = availability!.totalGoldTickets - availability!.goldPurchasedCount;
+        if(goldCount < maxGold){
+          setGoldCount( (prev)=>{return prev+=1} )
+        }
+      }
+      if(targetTicket === "platinum"){
+        const maxPlatinum = availability!.totalPlatinumTickets - availability!.platinumPurchasedCount;
+        if(platinumCount < maxPlatinum){
+          setPlatinumCount( (prev)=>{return prev+=1} )
+        }
+      }
+    }
+
+    const handleDecTicket = (e : React.MouseEvent<HTMLButtonElement>)=>{
+      const targetTicket = e.currentTarget.name;
+      if(targetTicket === "silver"){
+        if(silverCount == 0) return 
+        setSilverCount( (prev)=>{return prev-=1} )
+      }
+      if(targetTicket === "gold"){
+        if(goldCount == 0) return 
+        setGoldCount( (prev)=>{return prev-=1} )
+      }
+      if(targetTicket === "platinum"){
+        if(platinumCount == 0) return 
+        setPlatinumCount( (prev)=>{return prev-=1} )
+      }
+    }
 
     if (queuePosition === undefined || availability === undefined || !event) {
       return <Spinner />;
@@ -127,16 +148,34 @@ export default function JoinQueue({
                 {/* ////////////////////////////////////////////// */}
                 <div className="grid grid-cols-1 gap-4 p-3 rounded-2xl border-2 border-gray-200">
                   <div className="grid grid-cols-3 gap-6">
-                      <div className="">
-                          {/**Danger */}
-                          <Input value={silverCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} onChange={handleOnChange} name="silver" type="number" min="0" max={availability.totalSilverTickets - availability.silverPurchasedCount} onKeyDown={(e) => e.preventDefault()}/>
+                      
+                      {/* Desktop View */}
+                      <div className="hidden sm:block">
+                        <div className="flex flex-row gap-0.5 place-items-center">
+                            {/**Danger */}
+                            <Button name="silver" className="bg-red-500 w-7 h-7 hover:bg-red-700 hover:cursor-pointer" onClick={handleDecTicket}>-</Button>
+                            <Input readOnly value={silverCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} name="silver" type="number" onKeyDown={(e) => e.preventDefault()}/>
+                            <Button name="silver" className=" bg-green-500 w-7 h-7 hover:bg-green-700 hover:cursor-pointer" onClick={handleIncTicket}>+</Button>
+                        </div>
                       </div>
 
-                      <div className="flex items-center text-gray-600 mb-1">
+                      {/* Mobile View */}
+                      <div className="sm:hidden">
+                        <div className="flex flex-col gap-0.5 place-items-center">
+                            {/**Danger */}
+                            <div className="flex flex-row gap-1.5">
+                              <Button name="silver" className="bg-red-500 w-7 h-7 hover:bg-red-700 hover:cursor-pointer" onClick={handleDecTicket}>-</Button>
+                              <Button name="silver" className=" bg-green-500 w-7 h-7 hover:bg-green-700 hover:cursor-pointer" onClick={handleIncTicket}>+</Button>
+                            </div>
+                            <Input readOnly value={silverCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} name="silver" type="number" onKeyDown={(e) => e.preventDefault()}/>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center text-gray-600">
                           <span className="text-sm font-medium">Silver Tickets</span>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2 ml-4">
+                      <div className="flex flex-col items-end justify-center gap-2 ml-4">
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
@@ -146,38 +185,72 @@ export default function JoinQueue({
                   </div>
 
                   {availability.totalGoldTickets > 0 ? <div className="grid grid-cols-3 gap-6">
-                      <div className="">
-                          <Input value={goldCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} onChange={handleOnChange} name="gold" type="number" min="0" max={availability.totalGoldTickets - availability.goldPurchasedCount} onKeyDown={(e) => e.preventDefault()}/>
+                    {/* Desktop View */}
+                    <div className="hidden sm:block">
+                        <div className="flex flex-row gap-0.5 place-items-center">
+                            {/**Danger */}
+                            <Button name="gold" className="bg-red-500 w-7 h-7 hover:bg-red-700 hover:cursor-pointer" onClick={handleDecTicket}>-</Button>
+                            <Input readOnly value={goldCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} name="gold" type="number" onKeyDown={(e) => e.preventDefault()}/>
+                            <Button name="gold" className=" bg-green-500 w-7 h-7 hover:bg-green-700 hover:cursor-pointer" onClick={handleIncTicket}>+</Button>
+                        </div>
                       </div>
 
-                      <div className="flex items-center text-gray-600 mb-1">
+                      {/* Mobile View */}
+                      <div className="sm:hidden">
+                        <div className="flex flex-col gap-0.5 place-items-center">
+                            {/**Danger */}
+                            <div className="flex flex-row gap-1.5">
+                              <Button name="gold" className="bg-red-500 w-7 h-7 hover:bg-red-700 hover:cursor-pointer" onClick={handleDecTicket}>-</Button>
+                              <Button name="gold" className=" bg-green-500 w-7 h-7 hover:bg-green-700 hover:cursor-pointer" onClick={handleIncTicket}>+</Button>
+                            </div>
+                            <Input readOnly value={goldCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} name="gold" type="number" onKeyDown={(e) => e.preventDefault()}/>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center text-gray-600">
                           <span className="text-sm font-medium">Gold Tickets</span>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2 ml-4">
+                      <div className="flex flex-col items-end justify-center gap-2 ml-4">
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                            {/*//////////////////////////////////////////////////// */}
                           £{event.gold_price.toFixed(2)}
                           </span>
                       </div>
                   </div> : ""}
 
                   {availability.totalPlatinumTickets > 0 ? <div className="grid grid-cols-3 gap-6">
-                      <div className="">
-                          <Input value={platinumCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} onChange={handleOnChange} name="platinum" type="number" min="0" max={availability.totalPlatinumTickets - availability.platinumPurchasedCount} onKeyDown={(e) => e.preventDefault()}/>
+                    {/* Desktop View */}
+                    <div className="hidden sm:block">
+                        <div className="flex flex-row gap-0.5 place-items-center">
+                            {/**Danger */}
+                            <Button name="platinum" className="bg-red-500 w-7 h-7 hover:bg-red-700 hover:cursor-pointer" onClick={handleDecTicket}>-</Button>
+                            <Input readOnly value={platinumCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} name="platinum" type="number" onKeyDown={(e) => e.preventDefault()}/>
+                            <Button name="platinum" className=" bg-green-500 w-7 h-7 hover:bg-green-700 hover:cursor-pointer" onClick={handleIncTicket}>+</Button>
+                        </div>
                       </div>
 
-                      <div className="flex items-center text-gray-600 mb-1">
+                      {/* Mobile View */}
+                      <div className="sm:hidden">
+                        <div className="flex flex-col gap-0.5 place-items-center">
+                            {/**Danger */}
+                            <div className="flex flex-row gap-1.5">
+                              <Button name="platinum" className="bg-red-500 w-7 h-7 hover:bg-red-700 hover:cursor-pointer" onClick={handleDecTicket}>-</Button>
+                              <Button name="platinum" className=" bg-green-500 w-7 h-7 hover:bg-green-700 hover:cursor-pointer" onClick={handleIncTicket}>+</Button>
+                            </div>
+                            <Input readOnly value={platinumCount} disabled={!(!queuePosition || queuePosition.status != WAITING_LIST_STATUS.OFFERED)} name="platinum" type="number" onKeyDown={(e) => e.preventDefault()}/>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center text-gray-600">
                           <span className="text-sm font-medium">Platinum Tickets</span>
                       </div>
 
-                      <div className="flex flex-col items-end gap-2 ml-4">
+                      <div className="flex flex-col items-end justify-center gap-2 ml-4">
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                            {/*//////////////////////////////////////////////////// */}
                           £{event.platinum_price.toFixed(2)}
                           </span>
                       </div>
