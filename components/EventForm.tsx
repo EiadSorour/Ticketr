@@ -159,6 +159,17 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
             throw new Error("Initial event data is required for updates");
           }
 
+          //TODO check
+          if(initialData.totalSilverTickets > values.totalSilverTickets || 
+             initialData.totalGoldTickets > values.totalGoldTickets ||
+             initialData.totalPlatinumTickets > values.totalPlatinumTickets)
+          {
+            toast( "Error" , {
+              description: "You can only increase the total number of tickets.",
+            });
+            return;
+          }
+
           // Update event details
           await updateEvent({
             eventId: initialData._id,
@@ -351,7 +362,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
 
           <div className={`grid grid-cols-4 gap-4 items-center ${goldChecked ? "" : "line-through text-red-500"}`}>
             
-            <input checked={goldChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
+            <input disabled={(initialData && initialData?.totalGoldTickets > 1 ? true : false)} checked={goldChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
               setGoldChecked((e.target as HTMLInputElement).checked);
             }}/>
 
@@ -407,7 +418,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
 
           <div className={`grid grid-cols-4 gap-4 items-center ${platinumChecked ? "" : "line-through text-red-500"}`}>
             
-              <input checked={platinumChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
+              <input disabled={(initialData && initialData?.totalPlatinumTickets > 1 ? true : false)} checked={platinumChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
                 setPlatinumChecked((e.target as HTMLInputElement).checked);
               }}/>  
 

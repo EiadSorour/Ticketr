@@ -26,13 +26,15 @@ export default function ScanPage(){
     
     
 
-    if(!isLoaded){
+    if(!isLoaded || !eventDetails || !ticketDetails || !userDetails){
         return <Spinner></Spinner>
     }
 
-    console.log(user?.publicMetadata.role);
+    const eventCreatorId = eventDetails.userId;
+    const userTryingToScanId = user?.id;
+    
 
-    if(!user || (user && user.publicMetadata.role !== "admin")){
+    if(!user || user.publicMetadata.role !== "admin" || eventCreatorId != userTryingToScanId){
         router.push("/");
     }
 

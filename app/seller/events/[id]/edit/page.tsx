@@ -30,8 +30,7 @@ export default function EditEventPage() {
               <p className="text-sm">
                 Note: If you modify the total number of tickets, any tickets
                 already sold will remain valid. You can only increase the total
-                number of tickets, not decrease it below the number of tickets
-                already sold.
+                number of tickets, not decrease it.
               </p>
             </div>
           </div>
