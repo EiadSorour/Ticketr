@@ -71,18 +71,21 @@ export async function createStripeCheckoutSession({
 
   const fee = 0.01;    // 1% fee for the patform owner on every single transaction
 
-  const items = [
-    {
-      price_data: {
-        currency: "gbp",
-        product_data: {
-          name: "Silver Tickets"
+  const items = [];
+  if(queuePosition.silverCount > 0){
+    items.push(
+      {
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: "Silver Tickets"
+          },
+          unit_amount: Math.round(event.silver_price * 100),
         },
-        unit_amount: Math.round(event.silver_price * 100),
-      },
-      quantity: queuePosition.silverCount,
-    }
-  ];
+        quantity: queuePosition.silverCount,
+      }
+    )
+  }
   if(queuePosition.goldCount > 0){
     items.push(
       {

@@ -160,7 +160,16 @@ export const processQueue = mutation({
         remainingPlatinumTickets: number,
       } = await ctx.runQuery(api.events.getEventAvailability, { eventId });
 
-      if(user.silverCount <= availability.remainingSilverTickets &&
+      // (check if user number of tickets can't be purchased anymore)
+      if(user.silverCount > (availability.totalSilverTickets - availability.silverPurchasedCount) ||
+        user.goldCount > (availability.totalGoldTickets - availability.goldPurchasedCount) ||
+        user.platinumCount > (availability.totalPlatinumTickets - availability.platinumPurchasedCount))
+      {
+        // Update the waiting list entry to EXPIRED status
+        await ctx.db.patch(user._id, {
+          status: WAITING_LIST_STATUS.EXPIRED,
+        });
+      }else if(user.silverCount <= availability.remainingSilverTickets &&
           user.goldCount <= availability.remainingGoldTickets &&
           user.platinumCount <= availability.remainingPlatinumTickets)
       {
@@ -183,30 +192,6 @@ export const processQueue = mutation({
         );
       }
 
-    }
-  },
-});
-
-
-// TODO
-export const clearEventWaitingAfterUpdate = mutation({
-  args: {
-    eventId: v.id("events"),
-  },
-  handler: async (ctx, { eventId }) => {
-    const event = await ctx.db.get(eventId);
-    if (!event) throw new Error("Event not found");
-
-    // Get next users in line
-    const waitingUsers = await ctx.db
-      .query("waitingList")
-      .withIndex("by_event_status", (q) =>
-        q.eq("eventId", eventId).eq("status", WAITING_LIST_STATUS.OFFERED)
-      )
-      .collect();
-
-    for (const user of waitingUsers) {
-      await ctx.db.delete(user._id);
     }
   },
 });

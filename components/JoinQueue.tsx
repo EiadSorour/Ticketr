@@ -41,6 +41,21 @@ export default function JoinQueue({
 
     /*** Good ***/
     const handleJoinQueue = async () => {
+
+      const maxSilver = availability!.totalSilverTickets - availability!.silverPurchasedCount;
+      const maxGold = availability!.totalGoldTickets - availability!.goldPurchasedCount;
+      const maxPlatinum = availability!.totalPlatinumTickets - availability!.platinumPurchasedCount;
+      
+      if((silverCount > maxSilver) || 
+         (goldCount > maxGold) || 
+         (platinumCount > maxPlatinum))
+      {
+        toast("Tickets Count" , {
+          description: "Tickets count more than available tickets.",
+        });
+        return;
+      }
+      
       
       try {
         const result = await joinWaitingList({ eventId, userId, silverCount , goldCount, platinumCount });
