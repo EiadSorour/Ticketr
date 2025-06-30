@@ -17,6 +17,9 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
         eventId,
         userId: user?.id ?? "",
     });
+    const event = useQuery(api.events.getById, {
+      eventId: eventId,
+  });
 
     const [timeRemaining, setTimeRemaining] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -100,13 +103,13 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
 
                     <div className={`grid grid-cols-${girdColms} justify-items-center`}>
                       { queuePosition.silverCount > 0 ?
-                        <div><span className="font-bold underline">{queuePosition.silverCount}</span> Silver</div>
+                        <div><span className="font-bold underline">{queuePosition.silverCount}</span> {event?.t1_name}</div>
                       : ""}
                       {queuePosition.goldCount > 0 ? 
-                        <div><span className="font-bold underline">{queuePosition.goldCount}</span> Gold</div>
+                        <div><span className="font-bold underline">{queuePosition.goldCount}</span> {event?.t2_name}</div>
                       : ""}
                       {queuePosition.platinumCount > 0 ?
-                        <div><span className="font-bold underline">{queuePosition.platinumCount}</span> Platinum</div>
+                        <div><span className="font-bold underline">{queuePosition.platinumCount}</span> {event?.t3_name}</div>
                       : ""}
                     </div>
 

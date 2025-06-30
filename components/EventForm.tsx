@@ -36,6 +36,9 @@ const formSchema = z.object({
       new Date(new Date().setHours(0, 0, 0, 0)),
       "Event date must be in the future"
     ),
+  t1_name: z.string().min(1 , "Tier 1 name is required"),
+  t2_name: z.string().min(1, "Tier 2 name is required"),
+  t3_name: z.string().min(1, "Tier 3 name is required"),
   silver_price: z.number().min(0, "Price must be 0 or greater"),
   gold_price: z.number().min(0, "Price must be 0 or greater"),
   platinum_price: z.number().min(0, "Price must be 0 or greater"),
@@ -52,6 +55,9 @@ interface InitialEventData {
   description: string;
   location: string;
   eventDate: number;
+  t1_name: string;
+  t2_name: string;
+  t3_name: string;
   silver_price: number;
   totalSilverTickets: number;
   gold_price: number;
@@ -93,6 +99,9 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
       description: initialData?.description ?? "",
       location: initialData?.location ?? "",
       eventDate: initialData ? new Date(initialData.eventDate) : new Date(),
+      t1_name: initialData?.t1_name ?? "silver",
+      t2_name: initialData?.t2_name ?? "gold",
+      t3_name: initialData?.t3_name ?? "platinum",
       silver_price: initialData?.silver_price ?? 0,
       gold_price: initialData?.gold_price ?? 0,
       platinum_price: initialData?.platinum_price ?? 0,
@@ -113,8 +122,8 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
   }, []);
 
   async function onSubmit(values: FormData) {
-    if(!goldChecked){values.gold_price = 0; values.totalGoldTickets = 0}
-    if(!platinumChecked){values.platinum_price = 0; values.totalPlatinumTickets = 0}
+    if(!goldChecked){values.gold_price = 0; values.totalGoldTickets = 0; values.t2_name = ""}
+    if(!platinumChecked){values.platinum_price = 0; values.totalPlatinumTickets = 0; values.t3_name = ""}
     
     if (!user?.id) return;
 
@@ -159,7 +168,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
             throw new Error("Initial event data is required for updates");
           }
 
-          //TODO check
+          // check
           if(initialData.totalSilverTickets > values.totalSilverTickets || 
              initialData.totalGoldTickets > values.totalGoldTickets ||
              initialData.totalPlatinumTickets > values.totalPlatinumTickets)
@@ -312,7 +321,28 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
           <hr />
           <div className="grid grid-cols-4 gap-4 items-center">
           <input checked disabled type="checkbox" className="w-5 h-5"/>
-            <p className="font-bold">Silver Tier</p>
+            {/* <p className="font-bold">Silver Tier</p> */}
+            {/* ////////////////////////////////////////////////////// */}
+            <FormField
+              control={form.control}
+              name="t1_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-normal">Tier 1 name</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* ////////////////////////////////////////////////////// */}
 
             <FormField
               control={form.control}
@@ -366,7 +396,29 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
               setGoldChecked((e.target as HTMLInputElement).checked);
             }}/>
 
-            <p className="font-bold">Gold Tier</p>
+            {/* <p className="font-bold">Gold Tier</p> */}
+            {/* ////////////////////////////////////////////////////// */}
+            <FormField
+              disabled={goldChecked ? false : true}
+              control={form.control}
+              name="t2_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-normal">Tier 2 name</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* ////////////////////////////////////////////////////// */}
 
             <FormField
               disabled={goldChecked ? false : true}
@@ -422,7 +474,29 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                 setPlatinumChecked((e.target as HTMLInputElement).checked);
               }}/>  
 
-              <p className="font-bold">Platinum Tier</p>
+              {/* <p className="font-bold">Platinum Tier</p> */}
+              {/* ////////////////////////////////////////////////////// */}
+              <FormField
+                disabled={platinumChecked ? false : true}
+                control={form.control}
+                name="t3_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-normal">Tier 3 name</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* ////////////////////////////////////////////////////// */}
   
               <FormField
                 control={form.control}

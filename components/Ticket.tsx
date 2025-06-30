@@ -109,34 +109,6 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
               </div>
             </div>
 
-            {/* <div className="flex items-center text-gray-600">
-              <TicketIcon
-                className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
-              />
-              <div>
-                <p className="text-sm text-gray-500">Silver Ticket Price</p>
-                <p className="font-medium">£ {ticket.event.silver_price.toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <TicketIcon
-                className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
-              />
-              <div>
-                <p className="text-sm text-gray-500">Gold Ticket Price</p>
-                <p className="font-medium">£ {ticket.event.gold_price.toFixed(2)}</p>
-              </div>
-            </div>
-            <div className="flex items-center text-gray-600">
-              <TicketIcon
-                className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
-              />
-              <div>
-                <p className="text-sm text-gray-500">Platinum Ticket Price</p>
-                <p className="font-medium">£ {ticket.event.platinum_price.toFixed(2)}</p>
-              </div>
-            </div> */}
-
             <div className="flex items-center text-gray-600">
               <TicketIcon
                 className={`w-5 h-5 mr-3 ${ticket.event.is_cancelled ? "text-red-600" : "text-blue-600"}`}
@@ -153,9 +125,9 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
                 /> 
               <div className="grid grid-cols-1">
                   <p className="text-sm text-gray-500">Includes</p>
-                  <p className="font-medium">{ticket.silverCount > 0 ? `${ticket.silverCount} silver tickets` : ""}</p>
-                  <p className="font-medium">{ticket.goldCount > 0 ? `${ticket.goldCount} gold tickets` : ""}</p>
-                  <p className="font-medium">{ticket.platinumCount > 0 ? `${ticket.platinumCount} platinum tickets` : ""}</p>
+                  <p className="font-medium">{ticket.silverCount > 0 ? `${ticket.silverCount} ${ticket.event.t1_name} tickets` : ""}</p>
+                  <p className="font-medium">{ticket.goldCount > 0 ? `${ticket.goldCount} ${ticket.event.t2_name} tickets` : ""}</p>
+                  <p className="font-medium">{ticket.platinumCount > 0 ? `${ticket.platinumCount} ${ticket.event.t3_name} tickets` : ""}</p>
               </div>
             </div>
               

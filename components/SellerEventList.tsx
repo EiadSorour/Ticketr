@@ -128,7 +128,7 @@ function SellerEventCard({
                 <div className="flex items-center gap-2 text-gray-600 mb-1">
                   <Ticket className="w-4 h-4" />
                   <span className="text-sm font-medium">
-                    {event.is_cancelled ? "Silver Tickets Refunded" : "Silver Tickets Sold"}
+                    {event.is_cancelled ? `${event.t1_name} Tickets Refunded` : `${event.t1_name} Tickets Sold`}
                   </span>
                 </div>
                 <p className="text-2xl font-semibold text-gray-900">
@@ -155,7 +155,7 @@ function SellerEventCard({
                 <div className="flex items-center gap-2 text-gray-600 mb-1">
                   <Ticket className="w-4 h-4" />
                   <span className="text-sm font-medium">
-                    {event.is_cancelled ? "Gold Tickets Refunded" : "Gold Tickets Sold"}
+                    {event.is_cancelled ? `${event.t2_name} Tickets Refunded` : `${event.t2_name} Tickets Sold`}
                   </span>
                 </div>
                 <p className="text-2xl font-semibold text-gray-900">
@@ -182,7 +182,7 @@ function SellerEventCard({
                 <div className="flex items-center gap-2 text-gray-600 mb-1">
                   <Ticket className="w-4 h-4" />
                   <span className="text-sm font-medium">
-                    {event.is_cancelled ? "Platinum Tickets Refunded" : "Platinum Tickets Sold"}
+                    {event.is_cancelled ? `${event.t3_name} Tickets Refunded` : `${event.t3_name} Tickets Sold`}
                   </span>
                 </div>
                 <p className="text-2xl font-semibold text-gray-900">

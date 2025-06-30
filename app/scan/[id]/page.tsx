@@ -69,15 +69,15 @@ export default function ScanPage(){
                     </div>
                     <div className="mb-2 flex gap-4">
                         <div className="bg-gray-50 rounded-lg px-4 py-2 flex-1">
-                            <span className="block text-gray-500 text-xs">Silver</span>
+                            <span className="block text-gray-500 text-xs">{eventDetails.t1_name}</span>
                             <span className="font-semibold text-lg">{ticketDetails.silverCount}</span>
                         </div>
                         {ticketDetails.goldCount > 0 ? <div className="bg-gray-50 rounded-lg px-4 py-2 flex-1">
-                            <span className="block text-gray-500 text-xs">Gold</span>
+                            <span className="block text-gray-500 text-xs">{eventDetails.t2_name}</span>
                             <span className="font-semibold text-lg">{ticketDetails.goldCount}</span>
                         </div>: ""}
                         {ticketDetails.platinumCount > 0 ? <div className="bg-gray-50 rounded-lg px-4 py-2 flex-1">
-                            <span className="block text-gray-500 text-xs">Platinum</span>
+                            <span className="block text-gray-500 text-xs">{eventDetails.t3_name}</span>
                             <span className="font-semibold text-lg">{ticketDetails.platinumCount}</span>
                         </div> : ""}
                     </div>

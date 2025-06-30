@@ -78,7 +78,7 @@ export async function createStripeCheckoutSession({
         price_data: {
           currency: "gbp",
           product_data: {
-            name: "Silver Tickets"
+            name: `${event.t1_name} Tickets`
           },
           unit_amount: Math.round(event.silver_price * 100),
         },
@@ -92,7 +92,7 @@ export async function createStripeCheckoutSession({
         price_data: {
           currency: "gbp",
           product_data: {
-            name: "Gold Tickets"
+            name: `${event.t2_name} Tickets`
           },
           unit_amount: Math.round(event.gold_price * 100),
         },
@@ -106,7 +106,7 @@ export async function createStripeCheckoutSession({
         price_data: {
           currency: "gbp",
           product_data: {
-            name: "Platinum Tickets"
+            name: `${event.t3_name} Tickets`
           },
           unit_amount: Math.round(event.platinum_price * 100),
         },

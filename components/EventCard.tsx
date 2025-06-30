@@ -229,7 +229,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
               <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
-                  Silver {" "}
+                  {event.t1_name} {" "}
                   {availability.totalSilverTickets - availability.silverPurchasedCount} /{" "}
                   {availability.totalSilverTickets} available
                   {!isPastEvent && availability.activeSilverOffers > 0 && (
@@ -243,7 +243,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
               {availability.totalGoldTickets > 0 ? <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
-                  Gold {" "}
+                {event.t2_name} {" "}
                   {availability.totalGoldTickets - availability.goldPurchasedCount} /{" "}
                   {availability.totalGoldTickets} available
                   {!isPastEvent && availability.activeGoldOffers > 0 && (
@@ -257,7 +257,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
               {availability.totalPlatinumTickets > 0 ? <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
-                  Platinum {" "}
+                  {event.t3_name} {" "}
                   {availability.totalPlatinumTickets - availability.platinumPurchasedCount} /{" "}
                   {availability.totalPlatinumTickets} available
                   {!isPastEvent && availability.activePlatinumOffers > 0 && (

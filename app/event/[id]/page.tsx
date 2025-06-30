@@ -97,17 +97,17 @@ function Page(){
                                             <span className="text-sm font-medium">Availability</span>
                                         </div>
                                         <p className="text-gray-900">
-                                            Silver {" "}
+                                            {event.t1_name} {" "}
                                             {availability.totalSilverTickets - availability.silverPurchasedCount} /{" "}
                                             {availability.totalSilverTickets} left
                                         </p>
                                         {availability.totalGoldTickets > 0 ? <p className="text-gray-900">
-                                            Gold {" "}
+                                            {event.t2_name} {" "}
                                             {availability.totalGoldTickets - availability.goldPurchasedCount} /{" "}
                                             {availability.totalGoldTickets} left
                                         </p> : ""}
                                         {availability.totalPlatinumTickets > 0 ? <p className="text-gray-900">
-                                            Platinum {" "}
+                                            {event.t3_name} {" "}
                                             {availability.totalPlatinumTickets - availability.platinumPurchasedCount} /{" "}
                                             {availability.totalPlatinumTickets} left 
                                         </p> : ""}

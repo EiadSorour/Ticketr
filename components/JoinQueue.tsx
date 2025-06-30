@@ -187,7 +187,7 @@ export default function JoinQueue({
                       </div>
 
                       <div className="flex items-center text-gray-600">
-                          <span className="text-sm font-medium">Silver Tickets</span>
+                          <span className="text-sm font-medium">{event.t1_name} Tickets</span>
                       </div>
 
                       <div className="flex flex-col items-end justify-center gap-2 ml-4">
@@ -223,7 +223,7 @@ export default function JoinQueue({
                       </div>
 
                       <div className="flex items-center text-gray-600">
-                          <span className="text-sm font-medium">Gold Tickets</span>
+                          <span className="text-sm font-medium">{event.t2_name} Tickets</span>
                       </div>
 
                       <div className="flex flex-col items-end justify-center gap-2 ml-4">
@@ -259,7 +259,7 @@ export default function JoinQueue({
                       </div>
 
                       <div className="flex items-center text-gray-600">
-                          <span className="text-sm font-medium">Platinum Tickets</span>
+                          <span className="text-sm font-medium">{event.t3_name} Tickets</span>
                       </div>
 
                       <div className="flex flex-col items-end justify-center gap-2 ml-4">
