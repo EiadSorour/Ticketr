@@ -50,9 +50,7 @@ export default function JoinQueue({
          (goldCount > maxGold) || 
          (platinumCount > maxPlatinum))
       {
-        toast("Tickets Count" , {
-          description: "Tickets count more than available tickets.",
-        });
+        toast.warning("Tickets count more than available tickets.");
         return;
       }
       
@@ -67,16 +65,13 @@ export default function JoinQueue({
           error instanceof ConvexError &&
           error.message.includes("joined the waiting list too many times")
         ) {
-          toast("Slow down there!" , {
+          toast.warning("Slow down there!" , {
             description: error.data,
             duration: 5000,
           });
         } else {
           console.error("Error joining waiting list:", error);
-          toast("Uh oh! Something went wrong." , {
-            description: "Failed to join queue. Please try again later.",
-            
-          });
+          toast.error("Failed to join queue. Please try again later.");
         }
       }
     };

@@ -31,15 +31,11 @@ export default function CancelEventButton({
     try {
       await refundEventTickets(eventId);
       await cancelEvent({ eventId });
-      toast("Event cancelled" , {
-        description: "All tickets have been refunded successfully.",
-      });
+      toast.success("All tickets have been refunded successfully.");
       router.push("/seller/events");
     } catch (error) {
       console.error("Failed to cancel event:", error);
-      toast("Error" ,{
-        description: "Failed to cancel event. Please try again.",
-      });
+      toast.error("Failed to cancel event. Please try again.");
     } finally {
       setIsCancelling(false);
     }

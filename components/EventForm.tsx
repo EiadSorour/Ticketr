@@ -173,9 +173,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
              initialData.totalGoldTickets > values.totalGoldTickets ||
              initialData.totalPlatinumTickets > values.totalPlatinumTickets)
           {
-            toast( "Error" , {
-              description: "You can only increase the total number of tickets.",
-            });
+            toast.warning( "You can only increase the total number of tickets." );
             return;
           }
 
@@ -197,15 +195,13 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
             });
           }
 
-          toast( "Event updated" , {
-            description: "Your event has been successfully updated.",
-          });
+          toast.success( "Your event has been successfully updated." );
 
           router.push(`/event/${initialData._id}`);
         }
       } catch (error) {
         console.error("Failed to handle event:", error);
-        toast( "Uh oh! Something went wrong." ,{
+        toast.error( "Uh oh! Something went wrong." ,{
             description: "There was a problem with your request.",
         });
       }
