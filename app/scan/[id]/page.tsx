@@ -30,13 +30,16 @@ export default function ScanPage(){
         return <Spinner></Spinner>
     }
 
-    const eventCreatorId = eventDetails.userId;
+    const eventCreatorId = eventDetails?.userId;
     const userTryingToScanId = user?.id;
     
 
-    if(!user || user.publicMetadata.role !== "admin" || eventCreatorId != userTryingToScanId){
+    if(!user || (user.publicMetadata.role !== "admin" && user.publicMetadata.role !== "super admin")){
+        router.push("/");
+    }else if(user.publicMetadata.role === "admin" && eventCreatorId != userTryingToScanId){
         router.push("/");
     }
+
 
     function handleOnTicketScanned(){
         scanTicket({ticketId: params.id as Id<"tickets">});
@@ -45,7 +48,7 @@ export default function ScanPage(){
     
 
 
-    return (
+    return ((user && ((user.publicMetadata.role === "admin" && eventCreatorId == userTryingToScanId) || (user.publicMetadata.role === "super admin")) ) ? 
         <div className="max-w-xl mx-auto mt-10 bg-white rounded-xl shadow-md p-8 border border-gray-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Ticket & Event Details</h2>
             {eventDetails && ticketDetails && userDetails ? (
@@ -100,6 +103,6 @@ export default function ScanPage(){
             ) : (
                 <div className="text-gray-500">Loading details...</div>
             )}
-        </div>
+        </div> : <Spinner></Spinner>
     )
 }
