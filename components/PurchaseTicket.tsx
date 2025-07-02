@@ -101,7 +101,7 @@ function PurchaseTicket({ eventId }: { eventId: Id<"events"> }){
                         </div>
                     </div>
 
-                    <div className={`grid grid-cols-${girdColms} justify-items-center`}>
+                    <div className="flex flex-wrap justify-center gap-4">
                       { queuePosition.silverCount > 0 ?
                         <div><span className="font-bold underline">{queuePosition.silverCount}</span> {event?.t1_name}</div>
                       : ""}

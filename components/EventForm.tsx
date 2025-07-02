@@ -315,7 +315,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
 
           
           <hr />
-          <div className="grid grid-cols-4 gap-4 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center">
           <input checked disabled type="checkbox" className="w-5 h-5"/>
             {/* <p className="font-bold">Silver Tier</p> */}
             {/* ////////////////////////////////////////////////////// */}
@@ -386,7 +386,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
           </div>
           <hr />
 
-          <div className={`grid grid-cols-4 gap-4 items-center ${goldChecked ? "" : "line-through text-red-500"}`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center ${goldChecked ? "" : "line-through text-red-500"}`}>
             
             <input disabled={(initialData && initialData?.totalGoldTickets > 1 ? true : false)} checked={goldChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
               setGoldChecked((e.target as HTMLInputElement).checked);
@@ -464,7 +464,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
           </div>
           <hr />
 
-          <div className={`grid grid-cols-4 gap-4 items-center ${platinumChecked ? "" : "line-through text-red-500"}`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center ${platinumChecked ? "" : "line-through text-red-500"}`}>
             
               <input disabled={(initialData && initialData?.totalPlatinumTickets > 1 ? true : false)} checked={platinumChecked} type="checkbox" className="w-5 h-5" onChange={(e)=>{ 
                 setPlatinumChecked((e.target as HTMLInputElement).checked);

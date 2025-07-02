@@ -80,13 +80,13 @@ function SellerEventCard({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm border ${event.is_cancelled ? "border-red-200" : "border-gray-200"} overflow-hidden`}
+      className={`bg-white rounded-lg shadow-lg border ${event.is_cancelled ? "border-red-200" : "border-gray-100"} overflow-hidden transition-all duration-200 hover:shadow-xl hover:scale-[1.01]`}
     >
-      <div className="p-6">
-        <div className="flex items-start gap-6">
+      <div className="p-10">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
           {/* Event Image */}
           {imageUrl && (
-            <div className="relative w-40 h-40 rounded-lg overflow-hidden shrink-0">
+            <div className="relative w-full h-48 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-xl overflow-hidden shrink-0 flex-none">
               <Image
                 src={imageUrl}
                 alt={event.name}
@@ -97,15 +97,51 @@ function SellerEventCard({
           )}
 
           {/* Event Details */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0 flex-grow">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 lg:gap-x-10">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900">
                   {event.name}
                 </h3>
-                <p className="mt-1 text-gray-500">{event.description}</p>
+                <p className="mt-3 text-gray-500">{event.description}</p>
+                <div className="mt-3 flex items-center gap-2 text-gray-600">
+                  <CalendarDays className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {new Intl.DateTimeFormat('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                    }).format(new Date(event.eventDate))}
+                  </span>
+                </div>
+                {!event.is_cancelled && event.totalSilverTickets > 0 && (
+                  <div className="mt-3 flex items-center gap-2 text-gray-600">
+                    <Ticket className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {event.t1_name}: <span className={`${event.totalSilverTickets - event.metrics.soldSilverTickets <= 0 ? "text-red-600" : "text-green-600"}`}>{event.totalSilverTickets - event.metrics.soldSilverTickets <= 0 ? "Sold Out" : "Available"}</span>
+                    </span>
+                  </div>
+                )}
+                {!event.is_cancelled && event.totalGoldTickets > 0 && (
+                  <div className="mt-3 flex items-center gap-2 text-gray-600">
+                    <Ticket className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {event.t2_name}: <span className={`${event.totalGoldTickets - event.metrics.soldGoldTickets <= 0 ? "text-red-600" : "text-green-600"}`}>{event.totalGoldTickets - event.metrics.soldGoldTickets <= 0 ? "Sold Out" : "Available"}</span>
+                    </span>
+                  </div>
+                )}
+                {!event.is_cancelled && event.totalPlatinumTickets > 0 && (
+                  <div className="mt-3 flex items-center gap-2 text-gray-600">
+                    <Ticket className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      {event.t3_name}: <span className={`${event.totalPlatinumTickets - event.metrics.soldPlatinumTickets <= 0 ? "text-red-600" : "text-green-600"}`}>{event.totalPlatinumTickets - event.metrics.soldPlatinumTickets <= 0 ? "Sold Out" : "Available"}</span>
+                    </span>
+                  </div>
+                )}
                 {event.is_cancelled && (
-                  <div className="mt-2 flex items-center gap-2 text-red-600">
+                  <div className="mt-3 flex items-center gap-2 text-red-600">
                     <Ban className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       Event Cancelled & Refunded
@@ -113,7 +149,7 @@ function SellerEventCard({
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col md:flex-col items-stretch sm:items-center gap-3 md:ml-auto flex-none">
                     <Link
                       href={`/seller/events/${event._id}/sales`}
                       className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors"

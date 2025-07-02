@@ -63,7 +63,7 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
 
       {/* Ticket Content */}
       <div className="p-6">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left Column - Event Details */}
           <div className="space-y-4">
             <div className="flex items-center text-gray-600">
@@ -95,7 +95,7 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
               <div>
                 <p className="text-sm text-gray-500">Ticket Holder</p>
                 <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="text-sm text-gray-500 truncate">{user.email}</p>
               </div>
             </div>
 
@@ -105,7 +105,7 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
               />
               <div>
                 <p className="text-sm text-gray-500">Ticket Holder ID</p>
-                <p className="font-medium">{user.userId}</p>
+                <p className="font-medium truncate">{user.userId}</p>
               </div>
             </div>
 
@@ -135,16 +135,16 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
           </div>
 
           {/* Right Column - QR Code */}
-          <div className="flex flex-col items-center justify-center border-l border-gray-200 pl-6">
-            <p className="mb-2 text-sm text-gray-500 break-all text-center max-w-[200px] md:max-w-full font-medium">
+          <div className="flex flex-col items-center justify-center pt-6 md:pt-0 md:border-l border-gray-200 md:pl-6">
+            <p className="mb-2 text-sm text-gray-500 break-all text-center md:max-w-full font-medium">
               Your QR code
             </p>
             <div
               className={`bg-gray-100 p-4 rounded-lg ${ticket.event.is_cancelled ? "opacity-50" : ""}`}
             >
-              <QRCode value={`${process.env.NEXT_PUBLIC_ROOT_URL}/scan/${ticket._id}`} className="w-32 h-32" />
+              <QRCode value={`${process.env.NEXT_PUBLIC_ROOT_URL}/scan/${ticket._id}`} className="w-28 h-28 md:w-32 md:h-32" />
             </div>
-            <p className="mt-2 text-sm text-gray-500 break-all text-center max-w-[200px] md:max-w-full">
+            <p className="mt-2 text-sm text-gray-500 break-all text-center md:max-w-full">
               Thank you for your purchase 💙
             </p>
           </div>
