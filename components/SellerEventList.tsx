@@ -10,6 +10,7 @@ import {
   Ban,
   Banknote,
   InfoIcon,
+  LayoutDashboardIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useStorageUrl } from "@/lib/utils";
@@ -20,9 +21,15 @@ import { Metrics } from "@/convex/events";
 
 export default function SellerEventList() {
   const { user } = useUser();
-  const events = useQuery(api.events.getSellerEvents, {
-    userId: user?.id ?? "",
-  });
+  
+  var events;
+  if(user?.publicMetadata.role === "admin"){
+      events = useQuery(api.events.getSellerEvents, {
+        userId: user?.id ?? "",
+      });
+  }else{
+    events = useQuery(api.events.getAllEvents);
+  }
 
   if (!events) return null;
 
@@ -107,6 +114,13 @@ function SellerEventCard({
                 )}
               </div>
               <div className="flex items-center gap-2">
+                    <Link
+                      href={`/seller/events/${event._id}/sales`}
+                      className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors"
+                    >
+                      <LayoutDashboardIcon className="w-4 h-4" />
+                      Sales
+                    </Link>
                 {!isPastEvent && !event.is_cancelled && (
                   <>
                     <Link
@@ -121,135 +135,9 @@ function SellerEventCard({
                 )}
               </div>
             </div>
-            
-            {/*////////////////////////////////////////////////////////////////////////*/}
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-gray-600 mb-1">
-                  <Ticket className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    {event.is_cancelled ? `${event.t1_name} Tickets Refunded` : `${event.t1_name} Tickets Sold`}
-                  </span>
-                </div>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {event.is_cancelled ? (
-                    <>
-                      {event.metrics.refundedSilverTickets}
-                      <span className="text-sm text-gray-500 font-normal">
-                        {" "}
-                        refunded
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {event.metrics.soldSilverTickets}
-                      <span className="text-sm text-gray-500 font-normal">
-                        /{event.totalSilverTickets}
-                      </span>
-                    </>
-                  )}
-                </p>
-              </div>
-
-              {event.totalGoldTickets > 0 ? <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-gray-600 mb-1">
-                  <Ticket className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    {event.is_cancelled ? `${event.t2_name} Tickets Refunded` : `${event.t2_name} Tickets Sold`}
-                  </span>
-                </div>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {event.is_cancelled ? (
-                    <>
-                      {event.metrics.refundedGoldTickets}
-                      <span className="text-sm text-gray-500 font-normal">
-                        {" "}
-                        refunded
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {event.metrics.soldGoldTickets}
-                      <span className="text-sm text-gray-500 font-normal">
-                        /{event.totalGoldTickets}
-                      </span>
-                    </>
-                  )}
-                </p>
-              </div> : ""}
-
-              {event.totalPlatinumTickets > 0 ? <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-gray-600 mb-1">
-                  <Ticket className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    {event.is_cancelled ? `${event.t3_name} Tickets Refunded` : `${event.t3_name} Tickets Sold`}
-                  </span>
-                </div>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {event.is_cancelled ? (
-                    <>
-                      {event.metrics.refundedPlatinumTickets}
-                      <span className="text-sm text-gray-500 font-normal">
-                        {" "}
-                        refunded
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {event.metrics.soldPlatinumTickets}
-                      <span className="text-sm text-gray-500 font-normal">
-                        /{event.totalPlatinumTickets}
-                      </span>
-                    </>
-                  )}
-                </p>
-              </div> : ""}
-              {/*////////////////////////////////////////////////////////////////////////*/}
-
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-gray-600 mb-1">
-                  <Banknote className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    {event.is_cancelled ? "Amount Refunded" : "Revenue"}
-                  </span>
-                </div>
-                <p className="text-2xl font-semibold text-gray-900">
-                  £
-                  {event.is_cancelled
-                    ? ((event.metrics.refundedSilverTickets * event.silver_price) + 
-                        (event.metrics.refundedGoldTickets * event.gold_price) + 
-                        (event.metrics.refundedPlatinumTickets * event.platinum_price))
-                    : event.metrics.revenue}
-                </p>
-              </div>
-
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-gray-600 mb-1">
-                  <CalendarDays className="w-4 h-4" />
-                  <span className="text-sm font-medium">Date</span>
-                </div>
-                <p className="text-sm font-medium text-gray-900">
-                  {new Date(event.eventDate).toLocaleDateString()}
-                </p>
-              </div>
-
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-2 text-gray-600 mb-1">
-                  <InfoIcon className="w-4 h-4" />
-                  <span className="text-sm font-medium">Status</span>
-                </div>
-                <p className="text-sm font-medium text-gray-900">
-                  {event.is_cancelled
-                    ? "Cancelled"
-                    : isPastEvent
-                      ? "Ended"
-                      : "Active"}
-                </p>
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }

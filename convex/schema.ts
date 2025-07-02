@@ -20,6 +20,18 @@ export default defineSchema({
     imageStorageId: v.optional(v.id("_storage")),
     is_cancelled: v.optional(v.boolean()),
   }),
+
+  transactions: defineTable({
+    transactionId: v.string(),
+    eventId: v.id("events"),
+    customerName: v.string(),
+    email: v.string(),
+    totalSilverTickets: v.number(),
+    totalGoldTickets: v.number(),
+    totalPlatinumTickets: v.number(),
+    totalCost: v.number(),
+    status: v.string()
+  }),
   
   tickets: defineTable({
     eventId: v.id("events"),

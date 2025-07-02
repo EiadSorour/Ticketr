@@ -1,3 +1,7 @@
+// user and admin and event owner OR
+// user and super admin
+
+
 "use client";
 
 import Spinner from "@/components/Spinner";

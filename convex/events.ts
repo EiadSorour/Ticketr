@@ -595,3 +595,69 @@ export const getSellerEvents = query({
   },
 });
 
+export const getAllEvents = query({
+  args: {},
+  handler: async (ctx) => {
+    const events = await ctx.db
+      .query("events")
+      .collect();
+
+    // For each event, get ticket sales data
+    const eventsWithMetrics = await Promise.all(
+      events.map(async (event) => {
+        const tickets = await ctx.db
+          .query("tickets")
+          .withIndex("by_event", (q) => q.eq("eventId", event._id))
+          .collect();
+
+        const validTickets = tickets.filter(
+          (t) => t.status === "valid" || t.status === "used"
+        );
+        const refundedTickets = tickets.filter((t) => t.status === "refunded");
+        const cancelledTickets = tickets.filter(
+          (t) => t.status === "cancelled"
+        );
+
+        var soldSilverTickets = 0;
+        var soldGoldTickets = 0;
+        var soldPlatinumTickets = 0;
+
+        validTickets.forEach(ticket => {
+          soldSilverTickets += ticket.silverCount;
+          soldGoldTickets += ticket.goldCount;
+          soldPlatinumTickets += ticket.platinumCount;
+        });
+
+        var refundedSilverTickets = 0;
+        var refundedGoldTickets = 0;
+        var refundedPlatinumTickets = 0;
+
+        refundedTickets.forEach(ticket => {
+          refundedSilverTickets += ticket.silverCount;
+          refundedGoldTickets += ticket.goldCount;
+          refundedPlatinumTickets += ticket.platinumCount;
+        });
+
+        const revenue = (soldSilverTickets * event.silver_price) + (soldGoldTickets * event.gold_price) + (soldPlatinumTickets * event.platinum_price);
+
+        const metrics: Metrics = {
+          soldSilverTickets,
+          soldGoldTickets,
+          soldPlatinumTickets,
+          refundedSilverTickets,
+          refundedGoldTickets,
+          refundedPlatinumTickets,
+          revenue,
+        };
+
+        return {
+          ...event,
+          metrics,
+        };
+      })
+    );
+
+    return eventsWithMetrics;
+  },
+});
+

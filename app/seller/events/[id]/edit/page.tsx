@@ -1,19 +1,38 @@
+// user and admin and event-owner OR
+// user and super admin
+
 "use client";
 
-import { useParams } from "next/navigation";
+import { redirect, useParams } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import EventForm from "@/components/EventForm";
 import { AlertCircle } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import Spinner from "@/components/Spinner";
 
 export default function EditEventPage() {
   const params = useParams();
   const event = useQuery(api.events.getById, {
     eventId: params.id as Id<"events">,
   });
+  const { user, isLoaded } = useUser();
 
   if (!event) return null;
+
+  if(!isLoaded){
+    return <Spinner></Spinner>
+  }
+
+  if(!user){
+    redirect("/");
+  }else if(user.publicMetadata.role !== "admin" && user.publicMetadata.role !== "super admin"){
+    redirect("/");
+  }else if(user.publicMetadata.role === "admin" && event.userId !== user.id){
+    redirect("/");
+  }
+  
 
   return (
     <div className="max-w-3xl mx-auto p-6">

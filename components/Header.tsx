@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../images/logo.png"
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import SearchBar from "./SearchBar";
 import { currentUser } from "@clerk/nextjs/server";
+import { CalendarDaysIcon } from "lucide-react";
 
 async function Header(){
     const user = await currentUser();    
@@ -24,7 +25,7 @@ async function Header(){
 
                     <div className="lg:hidden">
                         <SignedIn>
-                            <UserButton />
+                            <UserButton  />
                         </SignedIn>
 
                         <SignedOut>
@@ -32,7 +33,7 @@ async function Header(){
                                 <button className="bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition border border-gray-300">
                                     Sign In
                                 </button>
-                            </SignInButton> 
+                            </SignInButton>
                         </SignedOut>
                     </div>
 
@@ -48,7 +49,8 @@ async function Header(){
                 <div className="hidden lg:block ml-auto">
                     <SignedIn>
                         <div className="flex items-center gap-3">
-                            {(user?.publicMetadata?.role === "admin" || user?.publicMetadata?.role === "super admin" ) ? <Link href="/seller">
+                            {(user?.publicMetadata?.role === "admin" || user?.publicMetadata?.role === "super admin" ) ? 
+                            <Link href="/seller">
                                 <button className="bg-blue-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-blue-700 transition">
                                     Sell Tickets
                                 </button>
@@ -60,9 +62,9 @@ async function Header(){
                                 </button>
                             </Link>
                             {(user?.publicMetadata?.role === "admin" || user?.publicMetadata?.role === "super admin" ) && (
-                                <Link href="/admin">
-                                    <button className="bg-yellow-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-yellow-700 transition">
-                                        Admin Dashboard
+                                <Link href={`${user?.publicMetadata?.role === "admin" ? "/admin" : "/superAdmin"}/dashboard`} className="flex-1">
+                                    <button className="w-full bg-yellow-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-yellow-700 transition">
+                                        Dashboard
                                     </button>
                                 </Link>
                             )}
@@ -94,9 +96,9 @@ async function Header(){
                             </button>
                         </Link>
                         {(user?.publicMetadata?.role === "admin" || user?.publicMetadata?.role === "super admin" ) && (
-                            <Link href="/admin" className="flex-1">
+                            <Link href={`${user?.publicMetadata?.role === "admin" ? "/admin" : "/superAdmin"}/dashboard`} className="flex-1">
                                 <button className="w-full bg-yellow-600 text-white px-3 py-1.5 text-sm rounded-lg hover:bg-yellow-700 transition">
-                                    Admin Dashboard
+                                    Dashboard
                                 </button>
                             </Link>
                         )}

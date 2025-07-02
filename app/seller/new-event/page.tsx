@@ -1,6 +1,24 @@
+// user and (admin or super admin)
+
+"use client"
+
 import EventForm from "@/components/EventForm";
+import Spinner from "@/components/Spinner";
+import { useUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export default function NewEventPage() {
+
+  const { user, isLoaded } = useUser();
+  
+  if(!isLoaded){
+    return <Spinner></Spinner>
+  }
+
+  if(!user || (user.publicMetadata.role !== "admin" && user.publicMetadata.role !== "super admin")){
+    redirect("/");
+  }
+
   return (
     <div className="max-w-3xl mx-auto p-6">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">

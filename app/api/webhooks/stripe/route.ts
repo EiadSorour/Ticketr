@@ -31,8 +31,39 @@ export async function POST(req: Request) {
     });
   }
 
+  console.log("Event type : " , event.type);
+  
+
   const convex = getConvexClient();
 
+
+  // Checkout failed
+  // if (event.type === "") {
+  //   console.log("Processing checkout.session.completed");
+  //   // const session = event.data.object;
+  //   // const metadata = session.metadata;
+  //   console.log("Session metadata:", event);
+  //   console.log("Convex client:", convex);
+
+  //   try {
+  //     // await convex.mutation(api.transactions.create, {
+  //     //   eventId: metadata.eventId,
+  //     //   totalSilverTickets: Number(metadata.silverCount),
+  //     //   totalGoldTickets: Number(metadata.goldCount),
+  //     //   totalPlatinumTickets: Number(metadata.platinumCount),
+  //     //   customerName: metadata.username,
+  //     //   email: metadata.email,
+  //     //   status: "Fail",
+  //     //   totalCost: session.amount ?? 0,
+  //     //   transactionId: session.id as string
+  //     // });
+  //   } catch (error) {
+  //     console.error("Error processing webhook:", error);
+  //     return new Response("Error processing webhook", { status: 500 });
+  //   }
+  // }
+
+  // Checkout success
   if (event.type === "checkout.session.completed") {
     console.log("Processing checkout.session.completed");
     const session = event.data.object as Stripe.Checkout.Session;
@@ -53,6 +84,20 @@ export async function POST(req: Request) {
           amount: session.amount_total ?? 0,
         },
       });
+
+      await convex.mutation(api.transactions.create, {
+        eventId: metadata.eventId,
+        totalSilverTickets: Number(metadata.silverCount),
+        totalGoldTickets: Number(metadata.goldCount),
+        totalPlatinumTickets: Number(metadata.platinumCount),
+        customerName: metadata.username,
+        email: metadata.email,
+        status: "Success",
+        totalCost: session.amount_total ?? 0,
+        transactionId: session.payment_intent as string
+      });
+      
+
       console.log("Purchase ticket mutation completed:", result);
     } catch (error) {
       console.error("Error processing webhook:", error);

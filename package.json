@@ -17,6 +17,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.24.8",
+    "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "html2canvas-pro": "^1.5.11",
     "jspdf": "^3.0.1",
@@ -30,6 +31,7 @@
     "sonner": "^2.0.5",
     "stripe": "^18.2.1",
     "tailwind-merge": "^3.3.1",
+    "xlsx": "^0.18.5",
     "zod": "^3.25.67"
   },
   "devDependencies": {

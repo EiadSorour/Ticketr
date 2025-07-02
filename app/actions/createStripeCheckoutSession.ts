@@ -15,6 +15,8 @@ export type StripeCheckoutMetaData = {
   goldCount: string;
   platinumCount: string;
   waitingListId: Id<"waitingList">;
+  username: string;
+  email: string;
 };
 
 export async function createStripeCheckoutSession({
@@ -36,6 +38,10 @@ export async function createStripeCheckoutSession({
     eventId,
     userId,
   });
+
+  const user = await convex.query(api.users.getUserById, {userId});
+
+  if(!user){throw new Error("User not found")};
 
   if (!queuePosition || queuePosition.status !== "offered") {
     throw new Error("No valid ticket offer found");
@@ -63,6 +69,8 @@ export async function createStripeCheckoutSession({
     goldCount: queuePosition.goldCount.toString(),
     platinumCount: queuePosition.platinumCount.toString(),
     waitingListId: queuePosition._id,
+    username: user.name,
+    email: user.email
   };
 
   const totalPrice = (queuePosition.silverCount * event.silver_price * 100) + 

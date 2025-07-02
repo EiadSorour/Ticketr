@@ -69,7 +69,7 @@ function SellerDashboard(){
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 {/* Header Section */}
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-8 text-white">
-                    <h2 className="text-2xl font-bold">Seller Dashboard</h2>
+                    <h2 className="text-2xl font-bold">Create your seller account</h2>
                     <p className="text-blue-100 mt-2">
                         Manage your seller profile and payment settings
                     </p>
@@ -83,7 +83,7 @@ function SellerDashboard(){
                             Sell tickets for your events
                         </h2>
                         <p className="text-gray-600 mb-8">
-                            List your tickets for sale and manage your listings
+                            List your tickets for sale.
                         </p>
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                             <div className="flex justify-center gap-4">
@@ -93,13 +93,6 @@ function SellerDashboard(){
                             >
                                 <Plus className="w-5 h-5" />
                                 Create Event
-                            </Link>
-                            <Link
-                                href="/seller/events"
-                                className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-                            >
-                                <CalendarDays className="w-5 h-5" />
-                                View My Events
                             </Link>
                             </div>
                         </div>
