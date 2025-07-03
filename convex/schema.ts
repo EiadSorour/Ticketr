@@ -26,6 +26,9 @@ export default defineSchema({
     eventId: v.id("events"),
     customerName: v.string(),
     email: v.string(),
+    address: v.string(),
+    phoneOne: v.string(),
+    phoneTwo: v.string(),
     totalSilverTickets: v.number(),
     totalGoldTickets: v.number(),
     totalPlatinumTickets: v.number(),
@@ -70,11 +73,14 @@ export default defineSchema({
   })
     .index("by_event_status", ["eventId", "status"])
     .index("by_user_event", ["userId", "eventId"])
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"]), 
 
   users: defineTable({
     name: v.string(),
     email: v.string(),
+    address: v.string(),
+    phoneOne: v.string(),
+    phoneTwo: v.string(),
     userId: v.string(),
     stripeConnectId: v.optional(v.string()),
   })

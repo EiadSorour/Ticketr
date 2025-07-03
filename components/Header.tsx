@@ -29,11 +29,22 @@ async function Header(){
                         </SignedIn>
 
                         <SignedOut>
-                            <SignInButton mode="modal">
+                            <Link 
+                                href={"/sign-up"}
+                            >
+                            
                                 <button className="bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition border border-gray-300">
+                                    Sign Up
+                                </button>
+                            </Link>
+                            <Link 
+                                href={"/sign-in"}
+                            >
+                            
+                                <button className="mx-3 bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition border border-gray-300">
                                     Sign In
                                 </button>
-                            </SignInButton>
+                            </Link>
                         </SignedOut>
                     </div>
 
@@ -73,11 +84,22 @@ async function Header(){
                     </SignedIn>
 
                     <SignedOut>
-                        <SignInButton mode="modal">
+                        <Link 
+                            href={"/sign-up"}
+                        >
+                        
                             <button className="bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition border border-gray-300">
+                                Sign Up
+                            </button>
+                        </Link>
+                        <Link 
+                            href={"/sign-in"}
+                        >
+                        
+                            <button className="mx-3 bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-lg hover:bg-gray-200 transition border border-gray-300">
                                 Sign In
                             </button>
-                        </SignInButton>
+                        </Link>
                     </SignedOut>
                 </div>
 

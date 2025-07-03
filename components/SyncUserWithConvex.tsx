@@ -13,6 +13,7 @@ function SyncUserWithConvex(){
 
     useEffect(() => {
         if (!user) return;
+        
 
         const syncUser = async () => {
         try {
@@ -20,6 +21,9 @@ function SyncUserWithConvex(){
             userId: user.id,
             name: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
             email: user.emailAddresses[0]?.emailAddress ?? "",
+            address: user.unsafeMetadata.address as string,
+            phoneOne: user.unsafeMetadata.phoneNumber1 as string,
+            phoneTwo: user.unsafeMetadata.phoneNumber2 as string,
             });
         } catch (error) {
             console.error("Error syncing user:", error);

@@ -92,6 +92,9 @@ export async function POST(req: Request) {
         totalPlatinumTickets: Number(metadata.platinumCount),
         customerName: metadata.username,
         email: metadata.email,
+        address: metadata.address,
+        phoneOne: metadata.phoneOne,
+        phoneTwo: metadata.phoneTwo,
         status: "Success",
         totalCost: session.amount_total ?? 0,
         transactionId: session.payment_intent as string

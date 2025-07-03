@@ -20,8 +20,11 @@ export const updateUser = mutation({
       userId: v.string(),
       name: v.string(),
       email: v.string(),
+      address: v.string(),
+      phoneOne: v.string(),
+      phoneTwo: v.string()
     },
-    handler: async (ctx, { userId, name, email }) => {
+    handler: async (ctx, { userId, name, email, address, phoneOne, phoneTwo }) => {
       // Check if user exists
       const existingUser = await ctx.db
         .query("users")
@@ -33,6 +36,9 @@ export const updateUser = mutation({
         await ctx.db.patch(existingUser._id, {
           name,
           email,
+          address,
+          phoneOne,
+          phoneTwo
         });
         return existingUser._id;
       }
@@ -42,6 +48,9 @@ export const updateUser = mutation({
         userId,
         name,
         email,
+        address,
+        phoneOne,
+        phoneTwo,
         stripeConnectId: undefined,
       });
   

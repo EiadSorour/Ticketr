@@ -17,6 +17,9 @@ export type StripeCheckoutMetaData = {
   waitingListId: Id<"waitingList">;
   username: string;
   email: string;
+  address: string,
+  phoneOne: string,
+  phoneTwo: string
 };
 
 export async function createStripeCheckoutSession({
@@ -70,7 +73,10 @@ export async function createStripeCheckoutSession({
     platinumCount: queuePosition.platinumCount.toString(),
     waitingListId: queuePosition._id,
     username: user.name,
-    email: user.email
+    email: user.email,
+    address: user.address,
+    phoneOne: user.phoneOne,
+    phoneTwo: user.phoneTwo
   };
 
   const totalPrice = (queuePosition.silverCount * event.silver_price * 100) + 

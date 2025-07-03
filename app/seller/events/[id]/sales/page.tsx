@@ -170,10 +170,10 @@ export default function EventSalesPage() {
             <tr className="bg-gray-100 text-left">
               <th className="py-3 px-4">Transaction ID</th>
               <th className="py-3 px-4">Name</th>
-              {/* <th className="py-3 px-4">Address</th> */}
+              <th className="py-3 px-4">Address</th>
               <th className="py-3 px-4">Email</th>
-              {/* <th className="py-3 px-4">Phone 1</th> */}
-              {/* <th className="py-3 px-4">Phone 2</th> */}
+              <th className="py-3 px-4">Phone 1</th>
+              <th className="py-3 px-4">Phone 2</th>
               <th className="py-3 px-4">Tickets Purchased</th>
               <th className="py-3 px-4">Total Cost</th>
               <th className="py-3 px-4">Status</th>
@@ -191,10 +191,10 @@ export default function EventSalesPage() {
                 <tr key={transaction._id} className="border-t hover:bg-gray-50">
                   <td className="py-2 px-4 font-mono">{transaction.transactionId}</td>
                   <td className="py-2 px-4">{transaction.customerName}</td>
-                  {/* <td className="py-2 px-4">{ticket.address}</td> */}
+                  <td className="py-2 px-4">{transaction.address}</td>
                   <td className="py-2 px-4">{transaction.email}</td>
-                  {/* <td className="py-2 px-4">{ticket.phone1}</td> */}
-                  {/* <td className="py-2 px-4">{ticket.phone2 || '-'}</td> */}
+                  <td className="py-2 px-4">{transaction.phoneOne || '-'}</td>
+                  <td className="py-2 px-4">{transaction.phoneTwo || '-'}</td>
                   <td className="py-2 px-4">
                       <div className="text-sm">
                         {event.t1_name}: <span className="font-bold">{transaction.totalSilverTickets}</span>
