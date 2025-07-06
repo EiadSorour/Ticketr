@@ -5,6 +5,9 @@ export const DURATIONS = {
   TICKET_OFFER: 30 * 60 * 1000, // 4 minutes (Minimum Stripe allows for checkout expiry)
 } as const;
 
+// export const CURRENCY = "£" as const;
+export const CURRENCY = "EGP" as const;
+
 // Status types for better type safety
 export const WAITING_LIST_STATUS: Record<string, Doc<"waitingList">["status"]> =
   {

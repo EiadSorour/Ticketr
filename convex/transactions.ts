@@ -38,6 +38,8 @@ export const search = query({
         const searchTermLower = searchTerm.toLowerCase();
         transactions = transactions.filter((transaction) => {
             return (
+                transaction.phoneOne.toLowerCase().includes(searchTermLower) ||
+                transaction.phoneTwo.toLowerCase().includes(searchTermLower) ||
                 transaction.customerName.toLowerCase().includes(searchTermLower) ||
                 transaction.email.toLowerCase().includes(searchTermLower) ||
                 transaction.transactionId.toLowerCase().includes(searchTermLower)

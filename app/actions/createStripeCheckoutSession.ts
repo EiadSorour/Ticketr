@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import baseUrl from "@/lib/baseUrl";
 import { auth } from "@clerk/nextjs/server";
-import { DURATIONS } from "@/convex/constants";
+import { CURRENCY, DURATIONS } from "@/convex/constants";
 
 export type StripeCheckoutMetaData = {
   eventId: Id<"events">;
@@ -90,7 +90,7 @@ export async function createStripeCheckoutSession({
     items.push(
       {
         price_data: {
-          currency: "gbp",
+          currency: CURRENCY,
           product_data: {
             name: `${event.t1_name} Tickets`
           },
@@ -104,7 +104,7 @@ export async function createStripeCheckoutSession({
     items.push(
       {
         price_data: {
-          currency: "gbp",
+          currency: CURRENCY,
           product_data: {
             name: `${event.t2_name} Tickets`
           },
@@ -118,7 +118,7 @@ export async function createStripeCheckoutSession({
     items.push(
       {
         price_data: {
-          currency: "gbp",
+          currency: CURRENCY,
           product_data: {
             name: `${event.t3_name} Tickets`
           },

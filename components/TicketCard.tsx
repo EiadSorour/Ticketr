@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Spinner from "./Spinner";
+import { CURRENCY } from "@/convex/constants";
 
 export default function TicketCard({ ticketId }: { ticketId: Id<"tickets"> }) {
   const ticket = useQuery(api.tickets.getTicketWithDetails, { ticketId });
@@ -107,9 +108,9 @@ export default function TicketCard({ ticketId }: { ticketId: Id<"tickets"> }) {
                   : "text-blue-600"
             }`}
           >
-            <div>£{ticket.event.silver_price} 
-              {ticket.event.platinum_price > 0 ? ` - £${ticket.event.platinum_price}` : 
-              ticket.event.gold_price > 0 ? ` - £${ticket.event.gold_price}` : ""}</div>
+            <div>{CURRENCY} {ticket.event.silver_price} 
+              {ticket.event.platinum_price > 0 ? ` - ${CURRENCY} ${ticket.event.platinum_price}` : 
+              ticket.event.gold_price > 0 ? ` - ${CURRENCY} ${ticket.event.gold_price}` : ""}</div>
             
           </span>
           <span className="text-gray-600 flex items-center">

@@ -15,6 +15,7 @@ import QRCode from "react-qr-code";
 import Spinner from "./Spinner";
 import { useStorageUrl } from "@/lib/utils";
 import Image from "next/image";
+import { CURRENCY } from "@/convex/constants";
 
 export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
   const ticket = useQuery(api.tickets.getTicketWithDetails, { ticketId });
@@ -115,7 +116,7 @@ export default function Ticket({ ticketId }: { ticketId: Id<"tickets"> }) {
               />
               <div>
                 <p className="text-sm text-gray-500">Ticket Price</p>
-                <p className="font-medium">£ {ticketTotalPrice?.toFixed(2)}</p>
+                <p className="font-medium">{CURRENCY} {ticketTotalPrice?.toFixed(2)}</p>
               </div>
             </div>
 

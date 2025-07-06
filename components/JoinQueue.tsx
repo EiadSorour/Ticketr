@@ -6,7 +6,7 @@ import { api } from "../convex/_generated/api";
 import { toast } from "sonner"
 import { ConvexError } from "convex/values";
 import Spinner from "./Spinner";
-import { WAITING_LIST_STATUS } from "@/convex/constants";
+import { CURRENCY, WAITING_LIST_STATUS } from "@/convex/constants";
 import { Clock, OctagonXIcon } from "lucide-react";
 import { Input } from "./ui/input";
 import { useState } from "react";
@@ -189,7 +189,7 @@ export default function JoinQueue({
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                          £{event.silver_price.toFixed(2)}
+                          {CURRENCY} {event.silver_price.toFixed(2)}
                           </span>
                       </div>
                   </div>
@@ -225,7 +225,7 @@ export default function JoinQueue({
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                          £{event.gold_price.toFixed(2)}
+                          {CURRENCY} {event.gold_price.toFixed(2)}
                           </span>
                       </div>
                   </div> : ""}
@@ -261,7 +261,7 @@ export default function JoinQueue({
                           <span
                           className={`px-4 py-1.5 font-semibold rounded-full bg-green-50 text-green-700`}
                           >
-                          £{event.platinum_price.toFixed(2)}
+                          {CURRENCY} {event.platinum_price.toFixed(2)}
                           </span>
                       </div>
                   </div> : "" }

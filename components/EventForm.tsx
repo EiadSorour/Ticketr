@@ -25,6 +25,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useStorageUrl } from "@/lib/utils";
 import { Checkbox } from "./ui/checkbox";
+import { CURRENCY } from "@/convex/constants";
 
 const formSchema = z.object({
   name: z.string().min(1, "Event name is required"),
@@ -100,15 +101,15 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
       location: initialData?.location ?? "",
       eventDate: initialData ? new Date(initialData.eventDate) : new Date(),
       t1_name: initialData?.t1_name ?? "silver",
-      t2_name: initialData?.t2_name ?? "gold",
-      t3_name: initialData?.t3_name ?? "platinum",
+      t2_name: (initialData?.t2_name == "" || !initialData?.t2_name) ? "gold" : initialData?.t2_name,
+      t3_name: (initialData?.t3_name == "" || !initialData?.t3_name) ? "platinum" : initialData?.t3_name,
       silver_price: initialData?.silver_price ?? 0,
       gold_price: initialData?.gold_price ?? 0,
       platinum_price: initialData?.platinum_price ?? 0,
       totalSilverTickets: initialData?.totalSilverTickets ?? 1,
       totalGoldTickets: initialData?.totalGoldTickets ?? 1,
       totalPlatinumTickets: initialData?.totalPlatinumTickets ?? 1,
-    },
+    }
   });
 
   
@@ -349,14 +350,14 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2">
-                        £
+                        {CURRENCY}
                       </span>
                       <Input
                         min={0}
                         type="number"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
-                        className="pl-6"
+                        className="pl-10"
                       />
                     </div>
                   </FormControl>
@@ -426,14 +427,14 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                   <FormControl>
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2">
-                        £
+                        {CURRENCY}
                       </span>
                       <Input
                         min={0}
                         type="number"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
-                        className="pl-6"
+                        className="pl-10"
                       />
                     </div>
                   </FormControl>
@@ -503,7 +504,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                     <FormControl>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2">
-                          £
+                          {CURRENCY}
                         </span>
                         <Input
                           disabled={platinumChecked ? false : true}
@@ -511,7 +512,7 @@ export default function EventForm({ mode, initialData }: EventFormProps) {
                           type="number"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
-                          className="pl-6"
+                          className="pl-10"
                         />
                       </div>
                     </FormControl>

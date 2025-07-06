@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { DURATIONS, TICKET_STATUS, WAITING_LIST_STATUS } from "./constants";
 import { api, internal } from "./_generated/api";
 
@@ -260,6 +260,7 @@ export const create = mutation({
       platinum_price: args.platinum_price,
       totalPlatinumTickets: args.totalPlatinumTickets,
       userId: args.userId,
+      is_hidden: false
     });
     return eventId;
   },
@@ -595,6 +596,7 @@ export const getSellerEvents = query({
   },
 });
 
+
 export const getAllEvents = query({
   args: {},
   handler: async (ctx) => {
@@ -658,6 +660,20 @@ export const getAllEvents = query({
     );
 
     return eventsWithMetrics;
+  },
+});
+
+export const toggleHidden = mutation({
+  args: { 
+    eventId: v.id("events") 
+  },
+  handler: async (ctx, { eventId }) => {
+
+    const event = await ctx.db.get(eventId);
+    
+    await ctx.db.patch(eventId, {
+      is_hidden: !event?.is_hidden,
+    });
   },
 });
 

@@ -9,6 +9,7 @@ import { useStorageUrl } from "../lib/utils";
 import Image from "next/image";
 import { CalendarDays, Check, CircleArrowRight, LoaderCircle, MapPin, PencilIcon, StarIcon, Ticket, XCircle } from "lucide-react";
 import PurchaseTicket from "./PurchaseTicket";
+import { CURRENCY } from "@/convex/constants";
 
 
 function EventCard({ eventId }: { eventId: Id<"events"> }){
@@ -196,9 +197,9 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
                       : "bg-green-50 text-green-700"
                   }`}
                 >
-                  £{event.silver_price.toFixed(2)} 
-                  {event.platinum_price != 0 ? ` - £${event.platinum_price.toFixed(2)}` : 
-                    event.gold_price != 0 ? ` - £${event.gold_price.toFixed(2)}` : ""
+                  {CURRENCY} {event.silver_price.toFixed(2)} 
+                  {event.platinum_price != 0 ? ` - ${CURRENCY} ${event.platinum_price.toFixed(2)}` : 
+                    event.gold_price != 0 ? ` - ${CURRENCY} ${event.gold_price.toFixed(2)}` : ""
                   }
                 </span>
                 {( (availability.silverPurchasedCount >= availability.totalSilverTickets) && 
@@ -226,7 +227,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
                 </span>
               </div>
     
-              <div className="flex items-center text-gray-600">
+              {!isPastEvent ? <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
                   {event.t1_name} {" "}
@@ -239,8 +240,8 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
                     </span>
                   )}
                 </span>
-              </div>
-              {availability.totalGoldTickets > 0 ? <div className="flex items-center text-gray-600">
+              </div> : ""}
+              {availability.totalGoldTickets > 0 && !isPastEvent ? <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
                 {event.t2_name} {" "}
@@ -254,7 +255,7 @@ function EventCard({ eventId }: { eventId: Id<"events"> }){
                   )}
                 </span>
               </div> : ""}
-              {availability.totalPlatinumTickets > 0 ? <div className="flex items-center text-gray-600">
+              {availability.totalPlatinumTickets > 0 && !isPastEvent ? <div className="flex items-center text-gray-600">
                 <Ticket className="w-4 h-4 mr-2" />
                 <span>
                   {event.t3_name} {" "}

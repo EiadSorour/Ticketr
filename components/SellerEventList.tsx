@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import {
   CalendarDays,
@@ -11,13 +11,16 @@ import {
   Banknote,
   InfoIcon,
   LayoutDashboardIcon,
+  EyeClosedIcon,
+  EyeIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useStorageUrl } from "@/lib/utils";
 import Image from "next/image";
 import CancelEventButton from "./CancelEventButton";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Metrics } from "@/convex/events";
+import { Button } from "./ui/button";
 
 export default function SellerEventList() {
   const { user } = useUser();
@@ -35,6 +38,7 @@ export default function SellerEventList() {
 
   const upcomingEvents = events.filter((e) => e.eventDate > Date.now());
   const pastEvents = events.filter((e) => e.eventDate <= Date.now());
+  
 
   return (
     <div className="mx-auto space-y-8">
@@ -78,6 +82,8 @@ function SellerEventCard({
   const imageUrl = useStorageUrl(event.imageStorageId);
   const isPastEvent = event.eventDate < Date.now();
 
+  const toggleHide = useMutation(api.events.toggleHidden);
+
   return (
     <div
       className={`bg-white rounded-lg shadow-lg border ${event.is_cancelled ? "border-red-200" : "border-gray-100"} overflow-hidden transition-all duration-200 hover:shadow-xl hover:scale-[1.01]`}
@@ -116,7 +122,7 @@ function SellerEventCard({
                     }).format(new Date(event.eventDate))}
                   </span>
                 </div>
-                {!event.is_cancelled && event.totalSilverTickets > 0 && (
+                {!event.is_cancelled && event.totalSilverTickets > 0 && !isPastEvent && (
                   <div className="mt-3 flex items-center gap-2 text-gray-600">
                     <Ticket className="w-4 h-4" />
                     <span className="text-sm font-medium">
@@ -124,7 +130,7 @@ function SellerEventCard({
                     </span>
                   </div>
                 )}
-                {!event.is_cancelled && event.totalGoldTickets > 0 && (
+                {!event.is_cancelled && event.totalGoldTickets > 0 && !isPastEvent && (
                   <div className="mt-3 flex items-center gap-2 text-gray-600">
                     <Ticket className="w-4 h-4" />
                     <span className="text-sm font-medium">
@@ -132,7 +138,7 @@ function SellerEventCard({
                     </span>
                   </div>
                 )}
-                {!event.is_cancelled && event.totalPlatinumTickets > 0 && (
+                {!event.is_cancelled && event.totalPlatinumTickets > 0 && !isPastEvent && (
                   <div className="mt-3 flex items-center gap-2 text-gray-600">
                     <Ticket className="w-4 h-4" />
                     <span className="text-sm font-medium">
@@ -169,6 +175,19 @@ function SellerEventCard({
                     <CancelEventButton eventId={event._id} />
                   </>
                 )}
+                {isPastEvent ? <>
+                    <Button
+                      onClick={async () => {await toggleHide({eventId : event._id})}}
+                      className="shrink-0 flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      {
+                        event.is_hidden ? 
+                        <EyeIcon className="w-4 h-4" /> : 
+                        <EyeClosedIcon className="w-4 h-4" />
+                      }
+                      {event.is_hidden ? "Unhide" : "Hide"}
+                    </Button>
+                  </> : ""}
               </div>
             </div>
             </div>

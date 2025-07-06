@@ -13,6 +13,7 @@ import EventCard from "../../../components/EventCard";
 import { Button } from "../../../components/ui/button";
 import JoinQueue from "../../../components/JoinQueue";
 import Link from "next/link";
+import {CURRENCY} from "@/convex/constants"; 
 
 function Page(){
 
@@ -33,6 +34,8 @@ function Page(){
         </div>
         );
     }
+
+    const isPastEvent = event.eventDate < Date.now();
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -80,19 +83,19 @@ function Page(){
                                         <p className="text-gray-900">{event.location}</p>
                                     </div>
 
-                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                    { !isPastEvent ? <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                                         <div className="flex items-center text-gray-600 mb-1">
                                             <Ticket className="w-5 h-5 mr-2 text-blue-600" />
                                             <span className="text-sm font-medium">Price</span>
                                         </div>
                                         <p className="text-gray-900">
-                                            £{event.silver_price.toFixed(2)} - 
-                                            £{event.platinum_price != 0 ? event.platinum_price.toFixed(2) : 
+                                            {CURRENCY} {event.silver_price.toFixed(2)} - 
+                                            {" " + CURRENCY} {event.platinum_price != 0 ? event.platinum_price.toFixed(2) : 
                                                 event.gold_price != 0 ? event.gold_price.toFixed(2) : event.silver_price.toFixed(2)}
                                         </p>
-                                    </div>
+                                    </div> : ""}
 
-                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                    {!isPastEvent ? <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                                         <div className="flex items-center text-gray-600 mb-1">
                                             <Users className="w-5 h-5 mr-2 text-blue-600" />
                                             <span className="text-sm font-medium">Availability</span>
@@ -112,7 +115,7 @@ function Page(){
                                             {availability.totalPlatinumTickets - availability.platinumPurchasedCount} /{" "}
                                             {availability.totalPlatinumTickets} left 
                                         </p> : ""}
-                                    </div>
+                                    </div> : ""}
                                 </div>
 
                                 {/* Additional Event Information */}

@@ -7,6 +7,7 @@
 import Spinner from "@/components/Spinner";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { CURRENCY } from "@/convex/constants";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { redirect, useParams } from "next/navigation";
@@ -108,7 +109,7 @@ export default function EventSalesPage() {
         {/* Card 2: Total Revenue */}
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-center">
           <h2 className="text-lg font-semibold mb-2">Total Revenue</h2>
-          <span className="text-2xl font-bold text-green-600">£ {eventRevenue}</span>
+          <span className="text-2xl font-bold text-green-600">{CURRENCY} {eventRevenue}</span>
         </div>
         {/* Card 3: Remaining Tickets per Category */}
         <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
@@ -136,7 +137,7 @@ export default function EventSalesPage() {
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-4">
         <input
           type="text"
-          placeholder="Search by name, email, or transaction ID..."
+          placeholder="name, email, phone number or transaction ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full md:w-96 px-4 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -208,7 +209,7 @@ export default function EventSalesPage() {
                         {event.t3_name}: <span className="font-bold">{transaction.totalPlatinumTickets}</span>
                       </div> : ""}
                   </td>
-                  <td className="py-2 px-4">${transaction.totalCost/100}</td>
+                  <td className="py-2 px-4">{CURRENCY} {transaction.totalCost/100}</td>
                   <td className="py-2 px-4">
                     <span
                       className={

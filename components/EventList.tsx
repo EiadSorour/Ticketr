@@ -23,7 +23,7 @@ function EventList(){
         .sort((a, b) => a.eventDate - b.eventDate);
 
     const pastEvents = events
-        .filter((event) => event.eventDate <= Date.now())
+        .filter((event) => event.eventDate <= Date.now() && !event.is_hidden)
         .sort((a, b) => b.eventDate - a.eventDate);
 
     return (

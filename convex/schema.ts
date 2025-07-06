@@ -19,6 +19,7 @@ export default defineSchema({
     userId: v.string(),
     imageStorageId: v.optional(v.id("_storage")),
     is_cancelled: v.optional(v.boolean()),
+    is_hidden: v.optional(v.boolean())
   }),
 
   transactions: defineTable({
